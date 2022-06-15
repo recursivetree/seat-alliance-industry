@@ -2,6 +2,7 @@
   "name": "recursivetree/seat-alliance-industry",
   "description": "Plan industry operations across an alliance",
   "license": "MIT",
+  "type": "seat-plugin",
   "authors": [
     {
       "name": "recursivetree",
@@ -25,7 +26,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "RecursiveTree\\Seat\\AllianceIndustry\\RattingMonitorServiceProvider"
+        "RecursiveTree\\Seat\\AllianceIndustry\\AllianceIndustryServiceProvider"
       ]
     }
   }
