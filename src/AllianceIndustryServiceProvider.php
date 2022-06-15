@@ -2,7 +2,13 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry;
 
+use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
+use RecursiveTree\Seat\AllianceIndustry\Models\Order;
+use RecursiveTree\Seat\AllianceIndustry\Observers\DeliveryObserver;
+use RecursiveTree\Seat\AllianceIndustry\Observers\OrderObserver;
+use RecursiveTree\Seat\AllianceIndustry\Policies\UserPolicy;
 use Seat\Services\AbstractSeatPlugin;
+use Illuminate\Support\Facades\Gate;
 
 class AllianceIndustryServiceProvider extends AbstractSeatPlugin
 {
@@ -15,9 +21,10 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
         $this->loadViewsFrom(__DIR__ . '/resources/views/', 'allianceindustry');
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations/');
 
-//        $this->publishes([
-//            __DIR__ . '/resources/js' => public_path('rattingmonitor/js')
-//        ]);
+        Gate::define('allianceindustry.same-user', UserPolicy::class.'@checkUser');
+
+        Delivery::observe(DeliveryObserver::class);
+        Order::observe(OrderObserver::class);
     }
 
     public function register(){

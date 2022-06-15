@@ -4,13 +4,19 @@ return [
         'name'          => 'Alliance Industry Planner',
         'icon'          => 'fas fa-industry',
         'route_segment' => 'allianceindustry',
-        'permission' => 'allianceindustry.industrialist',
+        'permission' => 'allianceindustry.view_orders',
         'entries'       => [
             [
-                'name'  => 'By Character',
+                'name'  => 'Orders',
+                'icon'  => 'fas fa-list',
+                'route' => 'allianceindustry.orders',
+                'permission' => 'allianceindustry.view_orders',
+            ],
+            [
+                'name'  => 'Deliveries',
                 'icon'  => 'fas fa-user',
-                'route' => 'rattingmonitor.character',
-                'permission' => 'rattingmonitor.cat',
+                'route' => 'allianceindustry.deliveries',
+                'permission' => 'allianceindustry.view_orders',
             ],
         ]
     ]
