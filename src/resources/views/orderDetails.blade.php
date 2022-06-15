@@ -38,37 +38,39 @@
         </div>
     </div>
 
-    @if($order->assignedQuantity()<$order->quantity)
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-header px-1">
-                    Supply Item
-                </h5>
-                <div class="card-text my-3">
+    @can("allianceindustry.create_deliveries")
+        @if($order->assignedQuantity()<$order->quantity)
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-header px-1">
+                        Supply Item
+                    </h5>
+                    <div class="card-text my-3">
 
-                    <form action="{{ route("allianceindustry.addDelivery",$order->id) }}" method="POST">
-                        @csrf
+                        <form action="{{ route("allianceindustry.addDelivery",$order->id) }}" method="POST">
+                            @csrf
 
-                        <div class="form-group">
-                            <label for="quantity">Quantity</label>
-                            <input type="number"
-                                   min="1"
-                                   max="{{ $order->quantity - $order->assignedQuantity() }}"
-                                   step="1"
-                                   value="{{ $order->quantity - $order->assignedQuantity() }}"
-                                   class="form-control"
-                                   id="quantity"
-                                   name="quantity">
-                        </div>
+                            <div class="form-group">
+                                <label for="quantity">Quantity</label>
+                                <input type="number"
+                                       min="1"
+                                       max="{{ $order->quantity - $order->assignedQuantity() }}"
+                                       step="1"
+                                       value="{{ $order->quantity - $order->assignedQuantity() }}"
+                                       class="form-control"
+                                       id="quantity"
+                                       name="quantity">
+                            </div>
 
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Supply this Item</button>
-                        </div>
-                    </form>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Supply this Item</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    @endif
+        @endif
+    @endcan
 @stop
 
 @push("javascript")
