@@ -254,20 +254,33 @@ class AllianceIndustryController extends Controller
         $marketHub = SettingHelper::getSetting("marketHub","jita");
         $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
         $priceType = SettingHelper::getSetting("priceType","buy");
+        $orderCreationPingRoles =  implode(" ", SettingHelper::getSetting("orderCreationPingRoles",[]));
 
-        return view("allianceindustry::settings", compact("marketHub","mpp","priceType"));
+        return view("allianceindustry::settings", compact("marketHub","mpp","priceType", "orderCreationPingRoles"));
     }
 
     public function saveSettings(Request $request){
         $request->validate([
             "market"=>"required|in:jita,perimeter,universe,amarr,dodixie,hek,rens",
             "pricetype"=>"required|in:sell,buy",
-            "minimumprofitpercentage"=>"required|numeric|min:0"
+            "minimumprofitpercentage"=>"required|numeric|min:0",
+            "pingRolesOrderCreation"=>"string|nullable"
         ]);
+
+        $roles = [];
+        if($request->pingRolesOrderCreation){
+            //parse roles
+            $roles = preg_replace('~\R~u', "\n", $request->pingRolesOrderCreation);
+            $matches = [];
+            preg_match_all("/\d+/m",$roles, $matches);
+            $roles = $matches[0];
+        }
+
 
         SettingHelper::setSetting("marketHub",$request->market);
         SettingHelper::setSetting("minimumProfitPercentage", floatval($request->minimumprofitpercentage));
         SettingHelper::setSetting("priceType",$request->pricetype);
+        SettingHelper::setSetting("orderCreationPingRoles",$roles);
 
         $request->session()->flash("success","Successfully saved settings");
         return redirect()->route("allianceindustry.settings");

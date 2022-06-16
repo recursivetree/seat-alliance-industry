@@ -49,6 +49,12 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="pingRolesOrderCreation">Notifications: Roles to ping on order creation</label>
+                        <input type="text" id="pingRolesOrderCreation" name="pingRolesOrderCreation" class="form-control" value="{{ $orderCreationPingRoles }}">
+                        <small class="text-muted">Please copy&paste the discord role ids separated by a space</small>
+                    </div>
+
+                    <div class="form-group">
                         <button type="submit" class="btn btn-primary">Update Settings</button>
                     </div>
                 </form>

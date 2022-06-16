@@ -2,6 +2,7 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry\Notifications;
 
+use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
 use Seat\Notifications\Notifications\AbstractNotification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -44,10 +45,14 @@ class OrderNotification extends AbstractNotification implements ShouldQueue
         $order = $this->order;
         $itemName = $order->type->typeName;
 
+        $pings = implode(" ", array_map(function ($role){
+            return "<@&$role>";
+        }, SettingHelper::getSetting("orderCreationPingRoles",[])));
+
         return (new SlackMessage)
             ->success()
             ->from('SeAT Alliance Industry Marketplace')
-            ->content("A order to produce $order->quantity $itemName(s) has been put up.")
+            ->content("$pings A order to produce $order->quantity $itemName(s) has been put up.")
             ->attachment(function ($attachment) use ($order) {
                 $attachment
                     ->title("View on SeAT",  route("allianceindustry.orderDetails", $order->id));
