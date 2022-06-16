@@ -23,6 +23,18 @@ Route::group([
         'middleware' => 'can:allianceindustry.create_deliveries'
     ]);
 
+    Route::get('/settings', [
+        'as'   => 'allianceindustry.settings',
+        'uses' => 'AllianceIndustryController@settings',
+        'middleware' => 'can:allianceindustry.settings'
+    ]);
+
+    Route::post('/settings/save', [
+        'as'   => 'allianceindustry.saveSettings',
+        'uses' => 'AllianceIndustryController@saveSettings',
+        'middleware' => 'can:allianceindustry.settings'
+    ]);
+
     Route::get('/order/{id}/details', [
         'as'   => 'allianceindustry.orderDetails',
         'uses' => 'AllianceIndustryController@orderDetails',

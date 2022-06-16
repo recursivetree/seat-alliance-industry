@@ -28,7 +28,8 @@
 
                     <div class="form-group">
                         <label for="profit">Reward %</label>
-                        <input type="number" id="profit" class="form-control" value="2.5" step="0.1" name="profit">
+                        <input type="number" id="profit" class="form-control" value="{{ $mpp }}" min="{{ $mpp }}" step="0.1" name="profit">
+                        <small class="text-muted">The minimal profit is {{$mpp}}%</small>
                     </div>
 
                     <div class="form-group">

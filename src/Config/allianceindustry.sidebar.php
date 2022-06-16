@@ -19,6 +19,12 @@ return [
                 'permission' => 'allianceindustry.view_orders',
             ],
             [
+                'name'  => 'Settings',
+                'icon'  => 'fas fa-cogs',
+                'route' => 'allianceindustry.settings',
+                'permission' => 'allianceindustry.settings',
+            ],
+            [
                 'name'  => 'About',
                 'icon'  => 'fas fa-info',
                 'route' => 'allianceindustry.about',

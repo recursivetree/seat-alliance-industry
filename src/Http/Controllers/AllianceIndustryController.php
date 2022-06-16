@@ -3,6 +3,7 @@
 namespace RecursiveTree\Seat\AllianceIndustry\Http\Controllers;
 
 
+use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use Seat\Eveapi\Models\Universe\UniverseStation;
@@ -29,16 +30,24 @@ class AllianceIndustryController extends Controller
         $stations = UniverseStation::all();
         $structures = UniverseStructure::all();
 
-        return view("allianceindustry::createOrder",compact("stations", "structures"));
+        $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
+
+        return view("allianceindustry::createOrder",compact("stations", "structures","mpp"));
     }
 
     public function submitOrder(Request $request){
         $request->validate([
             "items"=>"required|string",
-            "profit"=>"required|numeric",
+            "profit"=>"required|numeric|min:0",
             "days"=>"required|integer|min:1",
             "location"=>"required|integer"
         ]);
+
+        $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
+        if($request->profit < $mpp){
+            $request->session()->flash("error","The minimal profit can't be lower than $mpp%");
+            return redirect()->route("allianceindustry.createOrder");
+        }
 
 
         if(!(UniverseStructure::where("structure_id",$request->location)->exists()||UniverseStation::where("station_id",$request->location)->exists())) {
@@ -69,12 +78,14 @@ class AllianceIndustryController extends Controller
         }
 
         try {
+            $market = SettingHelper::getSetting("marketHub","jita");
+
             $client = new Client([
                 'timeout'  => 5.0,
             ]);
             $response = $client->request('POST', "https://evepraisal.com/appraisal/structured.json",[
                 'json' => [
-                    'market_name' => 'jita',
+                    'market_name' => $market,
                     'persist' => 'false',
                     'items'=>$items,
                 ]
@@ -88,17 +99,22 @@ class AllianceIndustryController extends Controller
 
         $now = now();
         $produce_until = now()->addDays($request->days);
-
+        $priceType = SettingHelper::getSetting("priceType","buy");
         $price_modifier = (1+(floatval($request->profit)/100.0));
 
         foreach ($data->appraisal->items as $item){
             $order = new Order();
 
+            if($priceType==="sell"){
+                $unit_price = $item->prices->sell->percentile;
+            } else {
+                $unit_price = $item->prices->buy->percentile;
+            }
 
             $order->type_id = $item->typeID;
             $order->quantity = $item->quantity;
             $order->user_id = auth()->user()->id;
-            $order->unit_price = $item->prices->sell->percentile * $price_modifier;
+            $order->unit_price = $unit_price * $price_modifier;
             $order->location_id = $request->location;
             $order->created_at = $now;
             $order->produce_until = $produce_until;
@@ -232,5 +248,28 @@ class AllianceIndustryController extends Controller
 
     public function about(){
         return view("allianceindustry::about");
+    }
+
+    public function settings(){
+        $marketHub = SettingHelper::getSetting("marketHub","jita");
+        $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
+        $priceType = SettingHelper::getSetting("priceType","buy");
+
+        return view("allianceindustry::settings", compact("marketHub","mpp","priceType"));
+    }
+
+    public function saveSettings(Request $request){
+        $request->validate([
+            "market"=>"required|in:jita,perimeter,universe,amarr,dodixie,hek,rens",
+            "pricetype"=>"required|in:sell,buy",
+            "minimumprofitpercentage"=>"required|numeric|min:0"
+        ]);
+
+        SettingHelper::setSetting("marketHub",$request->market);
+        SettingHelper::setSetting("minimumProfitPercentage", floatval($request->minimumprofitpercentage));
+        SettingHelper::setSetting("priceType",$request->pricetype);
+
+        $request->session()->flash("success","Successfully saved settings");
+        return redirect()->route("allianceindustry.settings");
     }
 }

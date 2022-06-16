@@ -16,5 +16,9 @@ return [
     'admin' => [
         'label' => 'Plugin Admin',
         'description' => 'Allows you to edit other\'s orders',
+    ],
+    'settings' => [
+        'label' => 'Plugin Settings',
+        'description' => 'Allows you to edit change plugin settings',
     ]
 ];
