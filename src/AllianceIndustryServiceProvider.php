@@ -33,6 +33,10 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
         Blade::directive('selected', function($condition) {
             return "<?php if($condition){ echo \"selected=\\\"selected\\\"\"; } ?>";
         });
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/Config/notifications.alerts.php', 'notifications.alerts'
+        );
     }
 
     public function register(){

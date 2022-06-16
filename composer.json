@@ -21,7 +21,8 @@
     "laravel/framework": "^6.2",
     "eveseat/web": "^4.15.0",
     "eveseat/eveapi": "^4.0",
-    "eveseat/services": "^4.0"
+    "eveseat/services": "^4.0",
+    "eveseat/notifications": "^4.0"
   },
   "extra": {
     "laravel": {
