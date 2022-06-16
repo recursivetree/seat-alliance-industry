@@ -32,7 +32,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="days">Produce Until</label>
+                        <label for="days">Days to complete</label>
                         <input type="number" id="days" class="form-control" name="days" min="1" step="1" value="30">
                     </div>
 

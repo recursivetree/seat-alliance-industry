@@ -49,7 +49,7 @@ class AllianceIndustryController extends Controller
         //parse items
         $multibuy = preg_replace('~\R~u', "\n", $request->items);
         $matches = [];
-        preg_match_all("/^(?<item_name>[\w '-]+?) (?:x)?(?<item_amount>\d+)$/m",$multibuy, $matches);
+        preg_match_all("/^(?<item_name>[\w '-]+?)\s+(?:x)?(?<item_amount>\d+)/m",$multibuy, $matches);
 
 
         //get items
@@ -219,7 +219,7 @@ class AllianceIndustryController extends Controller
 
         Gate::authorize("allianceindustry.same-user",$order->user_id);
 
-        if(!$order->deliveries->isEmpty() && !$order->completed){
+        if(!$order->deliveries->isEmpty() && !$order->completed && !auth()->user()->can("allianceindustry.admin")){
             $request->session()->flash("error","You cannot delete orders that people are currently manufacturing!");
             return redirect()->route("allianceindustry.orders");
         }
