@@ -5,6 +5,12 @@ Route::group([
     'middleware' => ['web', 'auth'],
     'prefix' => 'allianceindustry',
 ], function () {
+    Route::get('/about', [
+        'as'   => 'allianceindustry.about',
+        'uses' => 'AllianceIndustryController@about',
+        'middleware' => 'can:allianceindustry.view_orders'
+    ]);
+
     Route::get('/orders', [
         'as'   => 'allianceindustry.orders',
         'uses' => 'AllianceIndustryController@orders',

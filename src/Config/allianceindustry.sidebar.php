@@ -18,6 +18,12 @@ return [
                 'route' => 'allianceindustry.deliveries',
                 'permission' => 'allianceindustry.view_orders',
             ],
+            [
+                'name'  => 'About',
+                'icon'  => 'fas fa-info',
+                'route' => 'allianceindustry.about',
+                'permission' => 'allianceindustry.view_orders',
+            ],
         ]
     ]
 ];

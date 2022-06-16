@@ -229,4 +229,8 @@ class AllianceIndustryController extends Controller
         $request->session()->flash("success","Successfully closed order!");
         return redirect()->route("allianceindustry.orders");
     }
+
+    public function about(){
+        return view("allianceindustry::about");
+    }
 }
