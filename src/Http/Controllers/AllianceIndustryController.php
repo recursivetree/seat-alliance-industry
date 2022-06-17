@@ -58,7 +58,7 @@ class AllianceIndustryController extends Controller
         //parse items
         $multibuy = preg_replace('~\R~u', "\n", $request->items);
         $matches = [];
-        preg_match_all("/^(?<item_name>[\w '-]+?)\s+(?:x)?(?<item_amount>\d+)/m",$multibuy, $matches);
+        preg_match_all("/^(?<item_name>[\w '-]+?)\s+x?(?<item_amount>\d+)(?:\s+-)*$/m",$multibuy, $matches);
 
 
         //get items
