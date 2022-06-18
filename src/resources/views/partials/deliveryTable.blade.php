@@ -6,17 +6,22 @@
         @endif
         <th>Amount</th>
         <th>Completed</th>
+        @if($showOrder ?? false)
+            <th>Unit Price</th>
+        @endif
+        <th>Total Price</th>
         <th>Accepted</th>
         <th>Character</th>
         <th>Corporation</th>
         <th>Alliance</th>
+            <th>Location</th>
         <th>Actions</th>
     </tr>
     </thead>
     <tbody>
     @if($deliveries->isEmpty())
         <tr>
-            <td colspan="7">
+            <td colspan="100">
                 No suppliers signed up for deliveries yet
             </td>
         </tr>
@@ -35,6 +40,14 @@
                     @include("allianceindustry::partials.time",["date"=>$delivery->completed_at])
                 @endif
             </td>
+            @if($showOrder ?? false)
+                <td>
+                    {{ number($delivery->order->unit_price) }} ISK
+                </td>
+            @endif
+            <td>
+                {{ number($delivery->order->unit_price * $delivery->quantity) }} ISK
+            </td>
             <td>
                 @include("allianceindustry::partials.time",["date"=>$delivery->accepted])
             </td>
@@ -47,6 +60,9 @@
             <td>
                 @include('web::partials.alliance', ['alliance' => $delivery->user->main_character->affiliation->alliance])
             </td>
+                <td>
+                    {{ $delivery->order->location()->name }}
+                </td>
             <td class="d-flex flex-row justify-content-between">
                 @can("allianceindustry.same-user",$delivery->user_id)
                     <form action="{{ route("allianceindustry.setDeliveryState",$delivery->order_id) }}" method="POST">
@@ -54,10 +70,14 @@
                         <input type="hidden" name="delivery" value="{{ $delivery->id }}">
 
                         @if($delivery->completed)
-                            <button type="submit" class="btn btn-warning text-nowrap confirmform" data-seat-action="mark this delivery as in progress">Mark as in Progress</button>
+                            <button type="submit" class="btn btn-warning text-nowrap confirmform"
+                                    data-seat-action="mark this delivery as in progress">Mark as in Progress
+                            </button>
                             <input type="hidden" name="completed" value="0">
                         @else
-                            <button type="submit" class="btn btn-warning text-nowrap confirmform" data-seat-action="mark this delivery as delivered">Mark Delivered</button>
+                            <button type="submit" class="btn btn-warning text-nowrap confirmform"
+                                    data-seat-action="mark this delivery as delivered">Mark Delivered
+                            </button>
                             <input type="hidden" name="completed" value="1">
                         @endif
                     </form>
@@ -66,7 +86,9 @@
                         @csrf
                         <input type="hidden" name="delivery" value="{{ $delivery->id }}">
 
-                        <button type="submit" class="btn btn-danger text-nowrap confirmform ml-1" data-seat-action="cancel this delivery">Cancel Delivery</button>
+                        <button type="submit" class="btn btn-danger text-nowrap confirmform ml-1"
+                                data-seat-action="cancel this delivery">Cancel Delivery
+                        </button>
                     </form>
                 @endcan
             </td>

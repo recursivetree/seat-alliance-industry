@@ -106,9 +106,9 @@ class AllianceIndustryController extends Controller
             $order = new Order();
 
             if($priceType==="sell"){
-                $unit_price = $item->prices->sell->percentile;
+                $unit_price = $item->prices->sell->min;
             } else {
-                $unit_price = $item->prices->buy->percentile;
+                $unit_price = $item->prices->buy->max;
             }
 
             $order->type_id = $item->typeID;
@@ -127,7 +127,7 @@ class AllianceIndustryController extends Controller
     }
 
     public function orderDetails($id, Request $request){
-        $order = Order::find($id);
+        $order = Order::with("deliveries")->find($id);
 
         if(!$order){
             $request->session()->flash("error","Could not find order");
@@ -217,7 +217,7 @@ class AllianceIndustryController extends Controller
     public function deliveries(){
         $user_id = auth()->user()->id;
 
-        $deliveries = Delivery::where("user_id",$user_id)->get();
+        $deliveries = Delivery::with("order")->where("user_id",$user_id)->get();
 
         return view("allianceindustry::deliveries",compact("deliveries"));
     }

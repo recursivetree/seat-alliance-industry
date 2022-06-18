@@ -17,7 +17,7 @@
     <tbody>
     @if($orders->isEmpty())
         <tr>
-            <td colspan="11">There are no order to display</td>
+            <td colspan="100">There are no order to display</td>
         </tr>
     @endif
     @foreach($orders as $order)
