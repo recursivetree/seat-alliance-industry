@@ -2,6 +2,7 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry;
 
+use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Observers\DeliveryObserver;
@@ -10,6 +11,7 @@ use RecursiveTree\Seat\AllianceIndustry\Policies\UserPolicy;
 use Seat\Services\AbstractSeatPlugin;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Artisan;
 
 class AllianceIndustryServiceProvider extends AbstractSeatPlugin
 {
@@ -32,6 +34,17 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
         });
         Blade::directive('selected', function($condition) {
             return "<?php if($condition){ echo \"selected=\\\"selected\\\"\"; } ?>";
+        });
+
+        Artisan::command('allianceindustry:notifications {--sync}', function () {
+            if ($this->option("sync")){
+                $this->info("processing...");
+                SendOrderNotifications::dispatchNow();
+                $this->info("Synchronously sent notification!");
+            } else {
+                SendOrderNotifications::dispatch()->onQueue('notifications');
+                $this->info("Scheduled notifications!");
+            }
         });
 
         $this->mergeConfigFrom(
