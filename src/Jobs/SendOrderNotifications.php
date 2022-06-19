@@ -28,7 +28,9 @@ class SendOrderNotifications implements ShouldQueue
     {
         $orders = Order::whereDate("created_at",">=",now()->subHours(1))->get();
 
-        self::dispatchNotification($orders);
+        if(!$orders->isEmpty()) {
+            self::dispatchNotification($orders);
+        }
     }
 
     //stolen from https://github.com/eveseat/notifications/blob/master/src/Observers/UserObserver.php

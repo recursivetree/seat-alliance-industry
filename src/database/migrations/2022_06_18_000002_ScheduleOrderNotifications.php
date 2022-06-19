@@ -12,7 +12,7 @@ class ScheduleOrderNotifications extends Migration
     {
         $schedule = new Schedule();
         $schedule->command = "allianceindustry:notifications";
-        $schedule->expression = "0 0 * * *";
+        $schedule->expression = "0 * * * *";
         $schedule->allow_overlap = false;
         $schedule->allow_maintenance = false;
         $schedule->save();
