@@ -26,7 +26,8 @@ class SendOrderNotifications implements ShouldQueue
 
     public function handle()
     {
-        $orders = Order::whereDate("created_at",">=",now()->subHours(1))->get();
+        $time = now()->subHours(1);
+        $orders = Order::where("created_at",">=",$time)->get();
 
         if(!$orders->isEmpty()) {
             self::dispatchNotification($orders);
