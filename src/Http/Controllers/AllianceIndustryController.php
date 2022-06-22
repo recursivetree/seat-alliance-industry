@@ -19,7 +19,10 @@ use Illuminate\Support\Facades\Gate;
 class AllianceIndustryController extends Controller
 {
     public function orders(){
-        $orders = Order::where("completed",false)->get();
+
+        $orders = Order::with("deliveries")->where("completed",false)->get()->filter(function ($order){
+            return $order->assignedQuantity() < $order->quantity;
+        });
 
         $personalOrders = Order::where("user_id",auth()->user()->id)->get();
 
