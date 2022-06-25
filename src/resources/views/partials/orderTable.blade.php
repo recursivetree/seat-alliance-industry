@@ -50,7 +50,7 @@
                 @include('web::partials.alliance', ['alliance' => $order->user->main_character->affiliation->alliance])
             </td>
             <td data-sort="{{ $order->location_id }}" data-filter="{{ $order->location()->name }}">
-                {{ $order->location()->name }}
+                @include("allianceindustry::partials.longTextTooltip",["text"=>$order->location()->name,"length"=>25])
             </td>
             <td data-sort="{{ carbon($order->created_at)->timestamp }}" data-filter="_">
                 @include("allianceindustry::partials.time",["date"=>$order->created_at])

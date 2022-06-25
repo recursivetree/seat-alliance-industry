@@ -1,3 +1,1 @@
-<span data-toggle="tooltip" data-placement="top" title="{{ $date }}">
-    {{ carbon($date)->diffForHumans() }}
-</span>
+@include("allianceindustry::partials.tooltip",["tooltip"=>$date,"text"=>carbon($date)->diffForHumans()])

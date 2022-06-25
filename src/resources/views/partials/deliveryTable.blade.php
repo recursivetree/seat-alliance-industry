@@ -63,7 +63,7 @@
                 @include('web::partials.alliance', ['alliance' => $delivery->user->main_character->affiliation->alliance])
             </td>
                 <td data-order="{{ $delivery->order->location_id }}" data-filter="{{ $delivery->order->location()->name }}">
-                    {{ $delivery->order->location()->name }}
+                    @include("allianceindustry::partials.longTextTooltip",["text"=>$delivery->order->location()->name])
                 </td>
             <td class="d-flex flex-row justify-content-between">
                 @can("allianceindustry.same-user",$delivery->user_id)
