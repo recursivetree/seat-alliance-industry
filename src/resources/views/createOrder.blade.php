@@ -57,18 +57,12 @@
     </div>
 @stop
 
-@push('javascript')
-    <script>
-        $(document).ready(function() {
-            $("#location").select2()
-        })
-    </script>
-@endpush
-
 @push("javascript")
     <script>
-        $(function () {
+        $(document).ready( function () {
+            $("#location").select2()
             $('[data-toggle="tooltip"]').tooltip()
-        })
+            $('.data-table').DataTable();
+        });
     </script>
 @endpush

@@ -1,4 +1,4 @@
-<table class="table table-striped table-hover">
+<table class="data-table table table-striped table-hover">
     <thead>
     <tr>
         @if($showOrder ?? false)
@@ -29,38 +29,40 @@
     @foreach($deliveries as $delivery)
         <tr>
             @if($showOrder ?? false)
-                <td>
+                <td data-order="{{ $delivery->order->type->typeID }}" data-filter="{{ $delivery->order->type->typeName }}">
                     <a href="{{ route("allianceindustry.orderDetails",$delivery->order_id) }}">{{ $delivery->order->type->typeName }}</a>
                 </td>
             @endif
-            <td>{{ $delivery->quantity }}</td>
-            <td>
+            <td data-order="{{ $delivery->quantity }}" data-filter="_">
+                {{ $delivery->quantity }}
+            </td>
+            <td data-order="{{ $delivery->completed_at?carbon($delivery->completed_at)->timestamp:0 }}" data-filter="_">
                 @include("allianceindustry::partials.boolean",["value"=>$delivery->completed])
                 @if($delivery->completed_at)
                     @include("allianceindustry::partials.time",["date"=>$delivery->completed_at])
                 @endif
             </td>
             @if($showOrder ?? false)
-                <td>
+                <td data-order="{{ $delivery->order->unit_price }}" data-filter="_">
                     {{ number($delivery->order->unit_price) }} ISK
                 </td>
             @endif
-            <td>
+            <td data-order="{{ $delivery->order->unit_price * $delivery->quantity }}" data-filter="_">
                 {{ number($delivery->order->unit_price * $delivery->quantity) }} ISK
             </td>
-            <td>
+            <td data-order="{{ $delivery->accepted }}" data-filter="_">
                 @include("allianceindustry::partials.time",["date"=>$delivery->accepted])
             </td>
-            <td>
+            <td data-order="{{ $delivery->user->id }}" data-filter="{{ $delivery->user->main_character->name }}">
                 @include("web::partials.character",["character"=>$delivery->user->main_character])
             </td>
-            <td>
+            <td data-order="{{ $delivery->user->main_character->affiliation->corporation_id }}" data-filter="{{ $delivery->user->main_character->affiliation->corporation->name }}">
                 @include('web::partials.corporation', ['corporation' => $delivery->user->main_character->affiliation->corporation])
             </td>
-            <td>
+            <td data-order="{{ $delivery->user->main_character->affiliation->alliance_id }}" data-filter="{{ $delivery->user->main_character->affiliation->alliance->name }}">
                 @include('web::partials.alliance', ['alliance' => $delivery->user->main_character->affiliation->alliance])
             </td>
-                <td>
+                <td data-order="{{ $delivery->order->location_id }}" data-filter="{{ $delivery->order->location()->name }}">
                     {{ $delivery->order->location()->name }}
                 </td>
             <td class="d-flex flex-row justify-content-between">

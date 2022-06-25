@@ -13,7 +13,7 @@
                     <a href="{{ route("allianceindustry.createOrder") }}" class="btn btn-primary ml-auto">Create Order</a>
                 @endcan
             </h5>
-            <div class="card-text">
+            <div class="card-text pt-3">
                 @include("allianceindustry::partials.orderTable",["orders"=>$orders])
             </div>
         </div>
@@ -24,7 +24,7 @@
             <h5 class="card-header d-flex flex-row align-items-baseline">
                 Your Orders
             </h5>
-            <div class="card-text">
+            <div class="card-text pt-3">
                 @include("allianceindustry::partials.orderTable",["orders"=>$personalOrders])
             </div>
         </div>
@@ -33,8 +33,9 @@
 
 @push("javascript")
     <script>
-        $(function () {
+        $(document).ready( function () {
             $('[data-toggle="tooltip"]').tooltip()
-        })
+            $('.data-table').DataTable();
+        });
     </script>
 @endpush

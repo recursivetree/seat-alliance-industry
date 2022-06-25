@@ -11,7 +11,7 @@
                 Orders
                 <a href="{{ route("allianceindustry.orders") }}" class="btn btn-primary ml-auto">Back</a>
             </h5>
-            <div class="card-text my-3">
+            <div class="card-text pt-3">
                 @include("allianceindustry::partials.orderTable",["orders"=>collect([$order])])
 
                 @can("allianceindustry.same-user",$order->user_id)
@@ -32,7 +32,7 @@
             <h5 class="card-header px-1">
                 Deliveries
             </h5>
-            <div class="card-text my-3">
+            <div class="card-text pt-3">
                 @include("allianceindustry::partials.deliveryTable",["deliveries"=>$order->deliveries])
             </div>
         </div>
@@ -75,8 +75,9 @@
 
 @push("javascript")
     <script>
-        $(function () {
+        $(document).ready( function () {
             $('[data-toggle="tooltip"]').tooltip()
-        })
+            $('.data-table').DataTable();
+        });
     </script>
 @endpush

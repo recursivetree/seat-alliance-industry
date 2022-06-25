@@ -10,8 +10,7 @@
             <h5 class="card-header d-flex flex-row align-items-baseline">
                 Your Deliveries
             </h5>
-            <div class="card-text">
-
+            <div class="card-text pt-3">
                 @include("allianceindustry::partials.deliveryTable",["deliveries"=>$deliveries,"showOrder"=>true])
             </div>
         </div>
@@ -20,8 +19,9 @@
 
 @push("javascript")
     <script>
-        $(function () {
+        $(document).ready( function () {
             $('[data-toggle="tooltip"]').tooltip()
-        })
+            $('.data-table').DataTable();
+        });
     </script>
 @endpush
