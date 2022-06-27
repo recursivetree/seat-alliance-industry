@@ -61,17 +61,19 @@ class AllianceIndustryController extends Controller
         //parse items
         $multibuy = preg_replace('~\R~u', "\n", $request->items);
         $matches = [];
-        preg_match_all("/^(?<item_name>[\w '-]+?)\s+x?(?<item_amount>\d+)(?:\s+-)*$/m",$multibuy, $matches);
+        preg_match_all("/^(?<item_name>[\w '-]+?)\s+x?(?<item_amount>\d+)(?:\s+-)*(?:\s+(?<item_price>\d+)(?:ISK)?)?$/m",$multibuy, $matches);
 
+        //dd($matches);
 
         //get items
         $items = [];
-        foreach (array_combine($matches["item_name"], $matches["item_amount"]) as $item=>$amount){
-            $amount = intval($amount);
+        $manual_items = [];
+        foreach ($matches["item_name"] as $index=>$name){
+            $amount = intval($matches["item_amount"][$index]);
             if($amount<1) continue;
 
             $items[] = [
-                "name"=>$item,
+                "name"=>$matches["item_name"][$index],
                 "quantity"=>$amount
             ];
         }
@@ -105,6 +107,9 @@ class AllianceIndustryController extends Controller
         $priceType = SettingHelper::getSetting("priceType","buy");
         $price_modifier = (1+(floatval($request->profit)/100.0));
 
+        $manual_prices = $matches["item_price"];
+        $item_names = $matches["item_name"];
+
         foreach ($data->appraisal->items as $item){
             $order = new Order();
 
@@ -112,6 +117,19 @@ class AllianceIndustryController extends Controller
                 $unit_price = $item->prices->sell->min;
             } else {
                 $unit_price = $item->prices->buy->max;
+            }
+
+            $name = $item->name;
+            $index = array_search($name,$item_names);
+            if($index !== false){
+                $manual_price = $manual_prices[$index];
+                if(strlen($manual_price)>0 && is_numeric($manual_price)){
+                    $manual_price = intval($manual_price);
+                    //don't allow too low prices
+                    if($manual_price > $unit_price){
+                        $unit_price = $manual_price;
+                    }
+                }
             }
 
             $order->type_id = $item->typeID;
