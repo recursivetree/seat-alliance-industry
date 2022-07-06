@@ -65,33 +65,35 @@
                 <td data-order="{{ $delivery->order->location_id }}" data-filter="{{ $delivery->order->location()->name }}">
                     @include("allianceindustry::partials.longTextTooltip",["text"=>$delivery->order->location()->name])
                 </td>
-            <td class="d-flex flex-row justify-content-between">
+            <td class="d-flex flex-row">
                 @can("allianceindustry.same-user",$delivery->user_id)
-                    <form action="{{ route("allianceindustry.setDeliveryState",$delivery->order_id) }}" method="POST">
+                    <form action="{{ route("allianceindustry.setDeliveryState",$delivery->order_id) }}" method="POST" style="width: 50%">
                         @csrf
                         <input type="hidden" name="delivery" value="{{ $delivery->id }}">
 
                         @if($delivery->completed)
-                            <button type="submit" class="btn btn-warning text-nowrap confirmform"
-                                    data-seat-action="mark this delivery as in progress">Mark as in Progress
+                            <button type="submit" class="btn btn-warning text-nowrap confirmform btn-block"
+                                    data-seat-action="mark this delivery as in progress">In Progress
                             </button>
                             <input type="hidden" name="completed" value="0">
                         @else
-                            <button type="submit" class="btn btn-warning text-nowrap confirmform"
-                                    data-seat-action="mark this delivery as delivered">Mark Delivered
+                            <button type="submit" class="btn btn-primary text-nowrap confirmform btn-block"
+                                    data-seat-action="mark this delivery as delivered">Delivered
                             </button>
                             <input type="hidden" name="completed" value="1">
                         @endif
                     </form>
 
-                    <form action="{{ route("allianceindustry.deleteDelivery",$delivery->order_id) }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="delivery" value="{{ $delivery->id }}">
+                    @if(!$delivery->completed || auth()->user()->can("allianceindustry.admin"))
+                        <form action="{{ route("allianceindustry.deleteDelivery",$delivery->order_id) }}" method="POST" style="width: 50%">
+                            @csrf
+                            <input type="hidden" name="delivery" value="{{ $delivery->id }}">
 
-                        <button type="submit" class="btn btn-danger text-nowrap confirmform ml-1"
-                                data-seat-action="cancel this delivery">Cancel Delivery
-                        </button>
-                    </form>
+                            <button type="submit" class="btn btn-danger text-nowrap confirmform ml-1 btn-block"
+                                    data-seat-action="cancel this delivery">Cancel Delivery
+                            </button>
+                        </form>
+                    @endif
                 @endcan
             </td>
         </tr>

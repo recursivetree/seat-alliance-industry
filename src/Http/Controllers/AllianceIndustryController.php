@@ -225,6 +225,11 @@ class AllianceIndustryController extends Controller
 
         if($delivery) {
             Gate::authorize("allianceindustry.same-user", $delivery->user_id);
+
+            if($delivery->completed){
+                Gate::authorize("allianceindustry.admin");
+            }
+
             $delivery->delete();
 
             $request->session()->flash("success","Successfully removed delivery");
