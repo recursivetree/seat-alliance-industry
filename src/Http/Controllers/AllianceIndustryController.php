@@ -191,7 +191,7 @@ class AllianceIndustryController extends Controller
         $delivery->save();
 
         $request->session()->flash("success","Successfully added new delivery");
-        return redirect()->route("allianceindustry.orderDetails",$orderId);
+        return redirect()->back();
     }
 
     public function setDeliveryState($orderId,Request $request){
@@ -213,7 +213,7 @@ class AllianceIndustryController extends Controller
         }
         $delivery->save();
 
-        return redirect()->route("allianceindustry.orderDetails",$orderId);
+        return redirect()->back();
     }
 
     public function deleteDelivery($orderId, Request $request){
@@ -232,7 +232,7 @@ class AllianceIndustryController extends Controller
             $request->session()->flash("error","Could not find delivery");
         }
 
-        return redirect()->route("allianceindustry.orderDetails",$orderId);
+        return redirect()->back();
     }
 
     public function deliveries(){
