@@ -30,6 +30,11 @@
                         <label for="profit">Reward %</label>
                         <input type="number" id="profit" class="form-control" value="{{ $mpp }}" min="{{ $mpp }}" step="0.1" name="profit">
                         <small class="text-muted">The minimal profit is {{$mpp}}%</small>
+
+                        <div class="form-check">
+                            <input type="checkbox" id="addProfitToManualPrices" class="form-check-input" checked name="addProfitToManualPrices">
+                            <label for="addProfitToManualPrices" class="form-check-label">Add Reward to Manual Prices</label>
+                        </div>
                     </div>
 
                     <div class="form-group">

@@ -43,7 +43,8 @@ class AllianceIndustryController extends Controller
             "items"=>"required|string",
             "profit"=>"required|numeric|min:0",
             "days"=>"required|integer|min:1",
-            "location"=>"required|integer"
+            "location"=>"required|integer",
+            "addProfitToManualPrices"=>"nullable|in:on",
         ]);
 
         $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
@@ -106,11 +107,14 @@ class AllianceIndustryController extends Controller
         $produce_until = now()->addDays($request->days);
         $priceType = SettingHelper::getSetting("priceType","buy");
         $price_modifier = (1+(floatval($request->profit)/100.0));
+        $allowManualPriceBelowAutomatic = SettingHelper::getSetting("allowPriceBelowAutomatic",false);
 
         $manual_prices = $matches["item_price"];
         $item_names = $matches["item_name"];
 
         foreach ($data->appraisal->items as $item){
+            $has_manual_price = false;
+
             $order = new Order();
 
             if($priceType==="sell"){
@@ -126,16 +130,22 @@ class AllianceIndustryController extends Controller
                 if(strlen($manual_price)>0 && is_numeric($manual_price)){
                     $manual_price = intval($manual_price);
                     //don't allow too low prices
-                    if($manual_price > $unit_price){
+                    if($manual_price > $unit_price || $allowManualPriceBelowAutomatic){
                         $unit_price = $manual_price;
+                        $has_manual_price = true;
                     }
                 }
+            }
+
+
+            if(!($has_manual_price && !$request->addProfitToManualPrices)){
+                $unit_price = $unit_price * $price_modifier;
             }
 
             $order->type_id = $item->typeID;
             $order->quantity = $item->quantity;
             $order->user_id = auth()->user()->id;
-            $order->unit_price = $unit_price * $price_modifier;
+            $order->unit_price = $unit_price;
             $order->location_id = $request->location;
             $order->created_at = $now;
             $order->produce_until = $produce_until;
@@ -281,8 +291,9 @@ class AllianceIndustryController extends Controller
         $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
         $priceType = SettingHelper::getSetting("priceType","buy");
         $orderCreationPingRoles =  implode(" ", SettingHelper::getSetting("orderCreationPingRoles",[]));
+        $allowPriceBelowAutomatic = SettingHelper::getSetting("allowPriceBelowAutomatic",false);
 
-        return view("allianceindustry::settings", compact("marketHub","mpp","priceType", "orderCreationPingRoles"));
+        return view("allianceindustry::settings", compact("marketHub","mpp","priceType", "orderCreationPingRoles","allowPriceBelowAutomatic"));
     }
 
     public function saveSettings(Request $request){
@@ -290,7 +301,8 @@ class AllianceIndustryController extends Controller
             "market"=>"required|in:jita,perimeter,universe,amarr,dodixie,hek,rens",
             "pricetype"=>"required|in:sell,buy",
             "minimumprofitpercentage"=>"required|numeric|min:0",
-            "pingRolesOrderCreation"=>"string|nullable"
+            "pingRolesOrderCreation"=>"string|nullable",
+            "allowPriceBelowAutomatic"=>"nullable|in:on"
         ]);
 
         $roles = [];
@@ -307,6 +319,7 @@ class AllianceIndustryController extends Controller
         SettingHelper::setSetting("minimumProfitPercentage", floatval($request->minimumprofitpercentage));
         SettingHelper::setSetting("priceType",$request->pricetype);
         SettingHelper::setSetting("orderCreationPingRoles",$roles);
+        SettingHelper::setSetting("allowPriceBelowAutomatic",boolval($request->allowPriceBelowAutomatic));
 
         $request->session()->flash("success","Successfully saved settings");
         return redirect()->route("allianceindustry.settings");

@@ -46,6 +46,14 @@
                     <div class="form-group">
                         <label for="mpp">Minimum Profit Percentage</label>
                         <input type="number" value="{{ $mpp }}" min="0" step="0.1" id="mpp" name="minimumprofitpercentage" class="form-control">
+                        <small class="text-muted">To incentive production, the plugin applies this % of the item value on top of the price. While creating an order, you can always choose to give a higher profit, but to avoid players ripping off others, they can't go below this value.</small>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" id="allowPriceBelowAutomatic" class="form-check-input" name="allowPriceBelowAutomatic" @checked($allowPriceBelowAutomatic)>
+                            <label for="allowPriceBelowAutomatic" class="form-check-label">Allow Manual Prices below automatic Prices</label>
+                        </div>
+                        <small class="text-muted">To avoid scam orders, manual prices are ignored if they are for less than the automatic price.</small>
                     </div>
 
                     <div class="form-group">
