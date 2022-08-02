@@ -23,6 +23,13 @@
         <div class="card-body">
             <h5 class="card-header d-flex flex-row align-items-baseline">
                 Your Orders
+
+                @if($personalOrders->where("completed",true)->isNotEmpty())
+                    <form action="{{ route("allianceindustry.deleteCompletedOrders") }}" method="POST" class="ml-auto">
+                        @csrf
+                        <button class="btn btn-danger">Close all completed Orders</button>
+                    </form>
+                @endif
             </h5>
             <div class="card-text pt-3">
                 @include("allianceindustry::partials.orderTable",["orders"=>$personalOrders])

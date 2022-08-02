@@ -76,4 +76,10 @@ Route::group([
         'uses' => 'AllianceIndustryController@submitOrder',
         'middleware' => 'can:allianceindustry.create_orders'
     ]);
+
+    Route::post('/user/orders/completed/delete', [
+        'as'   => 'allianceindustry.deleteCompletedOrders',
+        'uses' => 'AllianceIndustryController@deleteCompletedOrders',
+        'middleware' => 'can:allianceindustry.create_orders'
+    ]);
 });

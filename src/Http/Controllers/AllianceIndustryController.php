@@ -324,4 +324,13 @@ class AllianceIndustryController extends Controller
         $request->session()->flash("success","Successfully saved settings");
         return redirect()->route("allianceindustry.settings");
     }
+
+    public function deleteCompletedOrders(){
+        $orders = Order::where("user_id",auth()->user()->id)->where("completed",true)->get();
+        foreach ($orders as $order){
+            $order->delete();
+        }
+
+        return redirect()->back();
+    }
 }
