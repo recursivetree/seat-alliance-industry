@@ -23,7 +23,7 @@
                             name="items"
                             class="form-control"
                             placeholder="{{"Tristan 100\nOmen 100\nTritanium 30000"}}"
-                            rows="10"></textarea>
+                            rows="10">{{ $multibuy ?? "" }}</textarea>
                     </div>
 
                     <div class="form-group">
@@ -46,10 +46,10 @@
                         <label for="location">Location</label>
                         <select id="location" class="form-control" name="location">
                             @foreach($stations as $station)
-                                <option value="{{ $station->station_id }}">{{ $station->name }}</option>
+                                <option value="{{ $station->station_id }}" @selected($station->station_id == $location_id)>{{ $station->name }}</option>
                             @endforeach
                             @foreach($structures as $structure)
-                                <option value="{{ $structure->structure_id }}">{{ $structure->name }}</option>
+                                <option value="{{ $structure->structure_id }}" @selected($structure->structure_id == $location_id)>{{ $structure->name }}</option>
                             @endforeach
                         </select>
                     </div>

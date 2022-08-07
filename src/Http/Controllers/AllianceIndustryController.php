@@ -35,7 +35,9 @@ class AllianceIndustryController extends Controller
 
         $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
 
-        return view("allianceindustry::createOrder",compact("stations", "structures","mpp"));
+        $location_id = 60003760;
+
+        return view("allianceindustry::createOrder",compact("stations", "structures","mpp","location_id"));
     }
 
     public function submitOrder(Request $request){
