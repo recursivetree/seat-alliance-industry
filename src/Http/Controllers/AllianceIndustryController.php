@@ -47,6 +47,7 @@ class AllianceIndustryController extends Controller
             "days"=>"required|integer|min:1",
             "location"=>"required|integer",
             "addProfitToManualPrices"=>"nullable|in:on",
+            "addToSeatInventory"=>"nullable|in:on"
         ]);
 
         $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
@@ -110,6 +111,7 @@ class AllianceIndustryController extends Controller
         $priceType = SettingHelper::getSetting("priceType","buy");
         $price_modifier = (1+(floatval($request->profit)/100.0));
         $allowManualPriceBelowAutomatic = SettingHelper::getSetting("allowPriceBelowAutomatic",false);
+        $addToSeatInventory = $request->addToSeatInventory !== null;
 
         $manual_prices = $matches["item_price"];
         $item_names = $matches["item_name"];
@@ -151,6 +153,7 @@ class AllianceIndustryController extends Controller
             $order->location_id = $request->location;
             $order->created_at = $now;
             $order->produce_until = $produce_until;
+            $order->add_seat_inventory = $addToSeatInventory;
 
             $order->save();
         }

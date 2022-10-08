@@ -50,6 +50,10 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
         $this->mergeConfigFrom(
             __DIR__ . '/Config/notifications.alerts.php', 'notifications.alerts'
         );
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/Config/inventory.sources.php', 'inventory.sources'
+        );
     }
 
     public function register(){

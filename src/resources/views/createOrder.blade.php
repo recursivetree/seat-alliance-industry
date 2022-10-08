@@ -54,6 +54,17 @@
                         </select>
                     </div>
 
+                    @if(\RecursiveTree\Seat\TreeLib\Helpers\SeatInventoryPluginHelper::pluginIsAvailable())
+                        <div class="form-group">
+                            <label for="addToSeatInventory">Seat-Inventory</label>
+                            <div class="form-check">
+                                <input type="checkbox" id="addToSeatInventory" class="form-check-input" checked name="addToSeatInventory">
+                                <label for="addToSeatInventory" class="form-check-label">Add as source to seat-inventory</label>
+                            </div>
+                            <small class="text-muted">As soon as a delivery for this order is created, a item source will be added to seat-inventory. Once the delivery is marked as completed, the source will be removed.</small>
+                        </div>
+                    @endif
+
                     <button type="submit" class="btn btn-primary">Add Order</button>
                 </form>
 
