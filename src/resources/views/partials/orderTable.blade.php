@@ -40,14 +40,14 @@
             <td data-sort="{{ $order->unit_price * $order->quantity }}" data-filter="_">
                 {{ number($order->unit_price * $order->quantity) }} ISK
             </td>
-            <td data-sort="{{ $order->user->id }}" data-filter="{{ $order->user->main_character->name }}">
-                @include("web::partials.character",["character"=>$order->user->main_character])
+            <td data-sort="{{ $order->user->id ?? 0 }}" data-filter="{{ $order->user->main_character->name ?? "deleted user"}}">
+                @include("web::partials.character",["character"=>$order->user->main_character ?? null])
             </td>
-            <td data-sort="{{ $order->user->main_character->affiliation->corporation_id }}" data-filter="{{ $order->user->main_character->affiliation->corporation->name }}">
-                @include('web::partials.corporation', ['corporation' => $order->user->main_character->affiliation->corporation])
+            <td data-sort="{{ $order->user->main_character->affiliation->corporation_id ?? 0}}" data-filter="{{ $order->user->main_character->affiliation->corporation->name ?? trans('web::seat.unknown')}}">
+                @include('web::partials.corporation', ['corporation' => $order->user->main_character->affiliation->corporation ?? null])
             </td>
-            <td data-sort="{{ $order->user->main_character->affiliation->alliance_id }}" data-filter="{{ $order->user->main_character->affiliation->alliance->name }}">
-                @include('web::partials.alliance', ['alliance' => $order->user->main_character->affiliation->alliance])
+            <td data-sort="{{ $order->user->main_character->affiliation->alliance_id ?? 0}}" data-filter="{{ $order->user->main_character->affiliation->alliance->name ?? trans('web::seat.unknown')}}">
+                @include('web::partials.alliance', ['alliance' => $order->user->main_character->affiliation->alliance ?? null])
             </td>
             <td data-sort="{{ $order->location_id }}" data-filter="{{ $order->location()->name }}">
                 @include("allianceindustry::partials.longTextTooltip",["text"=>$order->location()->name,"length"=>25])

@@ -7,11 +7,13 @@ use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Observers\DeliveryObserver;
 use RecursiveTree\Seat\AllianceIndustry\Observers\OrderObserver;
+use RecursiveTree\Seat\AllianceIndustry\Observers\UserObserver;
 use RecursiveTree\Seat\AllianceIndustry\Policies\UserPolicy;
 use Seat\Services\AbstractSeatPlugin;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Artisan;
+use Seat\Web\Models\User;
 
 class AllianceIndustryServiceProvider extends AbstractSeatPlugin
 {
@@ -28,6 +30,7 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
 
         Delivery::observe(DeliveryObserver::class);
         Order::observe(OrderObserver::class);
+        User::observe(UserObserver::class);
 
         Blade::directive('checked', function($condition) {
             return "<?php if($condition){ echo \"checked=\\\"checked\\\"\"; } ?>";

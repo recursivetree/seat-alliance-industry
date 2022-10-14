@@ -53,14 +53,14 @@
             <td data-order="{{ $delivery->accepted }}" data-filter="_">
                 @include("allianceindustry::partials.time",["date"=>$delivery->accepted])
             </td>
-            <td data-order="{{ $delivery->user->id }}" data-filter="{{ $delivery->user->main_character->name }}">
-                @include("web::partials.character",["character"=>$delivery->user->main_character])
+            <td data-order="{{ $delivery->user->id ?? 0}}" data-filter="{{ $delivery->user->main_character->name ?? trans('web::seat.unknown')}}">
+                @include("web::partials.character",["character"=>$delivery->user->main_character ?? null])
             </td>
-            <td data-order="{{ $delivery->user->main_character->affiliation->corporation_id }}" data-filter="{{ $delivery->user->main_character->affiliation->corporation->name }}">
-                @include('web::partials.corporation', ['corporation' => $delivery->user->main_character->affiliation->corporation])
+            <td data-order="{{ $delivery->user->main_character->affiliation->corporation_id ?? 0}}" data-filter="{{ $delivery->user->main_character->affiliation->corporation->name ?? trans('web::seat.unknown')}}">
+                @include('web::partials.corporation', ['corporation' => $delivery->user->main_character->affiliation->corporation ?? null])
             </td>
-            <td data-order="{{ $delivery->user->main_character->affiliation->alliance_id }}" data-filter="{{ $delivery->user->main_character->affiliation->alliance->name }}">
-                @include('web::partials.alliance', ['alliance' => $delivery->user->main_character->affiliation->alliance])
+            <td data-order="{{ $delivery->user->main_character->affiliation->alliance_id }}" data-filter="{{ $delivery->user->main_character->affiliation->alliance->name ?? trans('web::seat.unknown') }}">
+                @include('web::partials.alliance', ['alliance' => $delivery->user->main_character->affiliation->alliance ?? null])
             </td>
                 <td data-order="{{ $delivery->order->location_id }}" data-filter="{{ $delivery->order->location()->name }}">
                     @include("allianceindustry::partials.longTextTooltip",["text"=>$delivery->order->location()->name])
