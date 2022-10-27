@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
+use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use Illuminate\Support\Facades\Notification;
 use Seat\Notifications\Models\NotificationGroup;
@@ -26,12 +27,20 @@ class SendOrderNotifications implements ShouldQueue
 
     public function handle()
     {
-        $time = now()->subHours(1);
-        $orders = Order::where("created_at",">=",$time)->get();
+        $now = now();
+        $last_notifications = AllianceIndustrySettings::$LAST_NOTIFICATION_BATCH->get();
+
+        if($last_notifications === null){
+            $orders = Order::all();
+        } else {
+            $orders = Order::where("created_at",">=",$last_notifications)->get();
+        }
 
         if(!$orders->isEmpty()) {
             self::dispatchNotification($orders);
         }
+
+        AllianceIndustrySettings::$LAST_NOTIFICATION_BATCH->set($now);
     }
 
     //stolen from https://github.com/eveseat/notifications/blob/master/src/Observers/UserObserver.php

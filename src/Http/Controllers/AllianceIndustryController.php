@@ -4,6 +4,7 @@ namespace RecursiveTree\Seat\AllianceIndustry\Http\Controllers;
 
 
 use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
+use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use Seat\Eveapi\Models\Universe\UniverseStation;
@@ -157,6 +158,9 @@ class AllianceIndustryController extends Controller
 
             $order->save();
         }
+
+        //send notification that orders have been put up. We don't do it in an observer so it only gets triggered once
+        SendOrderNotifications::dispatch()->onQueue('notifications');
 
         $request->session()->flash("success","Successfully added new order");
         return redirect()->route("allianceindustry.orders");
