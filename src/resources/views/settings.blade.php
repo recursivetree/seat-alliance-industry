@@ -59,7 +59,7 @@
                     <div class="form-group">
                         <label for="pingRolesOrderCreation">Notifications: Roles to ping on order creation</label>
                         <input type="text" id="pingRolesOrderCreation" name="pingRolesOrderCreation" class="form-control" value="{{ $orderCreationPingRoles }}">
-                        <small class="text-muted">Please copy&paste the discord role ids separated by a space</small>
+                        <small class="text-muted">Please copy&paste the discord role ids separated by a space. If you enable developer mode in your settings, you can get the IDs by clicking the role.</small>
                     </div>
 
                     <div class="form-group">
