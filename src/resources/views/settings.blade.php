@@ -1,7 +1,7 @@
 @extends('web::layouts.grids.12')
 
-@section('title', "About")
-@section('page_header', "About")
+@section('title', "Settings")
+@section('page_header', "Settings")
 
 
 @section('full')
