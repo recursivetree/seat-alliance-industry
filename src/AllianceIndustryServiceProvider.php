@@ -32,13 +32,6 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
         Order::observe(OrderObserver::class);
         User::observe(UserObserver::class);
 
-        Blade::directive('checked', function($condition) {
-            return "<?php if($condition){ echo \"checked=\\\"checked\\\"\"; } ?>";
-        });
-        Blade::directive('selected', function($condition) {
-            return "<?php if($condition){ echo \"selected=\\\"selected\\\"\"; } ?>";
-        });
-
         Artisan::command('allianceindustry:notifications {--sync}', function () {
             if ($this->option("sync")){
                 $this->info("processing...");
