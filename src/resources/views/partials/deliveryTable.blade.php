@@ -19,13 +19,6 @@
     </tr>
     </thead>
     <tbody>
-    @if($deliveries->isEmpty())
-        <tr>
-            <td colspan="100">
-                No suppliers signed up for deliveries yet
-            </td>
-        </tr>
-    @endif
     @foreach($deliveries as $delivery)
         <tr>
             @if($showOrder ?? false)

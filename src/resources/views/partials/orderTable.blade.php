@@ -15,11 +15,6 @@
     </tr>
     </thead>
     <tbody>
-    @if($orders->isEmpty())
-        <tr>
-            <td colspan="100">There are no order to display</td>
-        </tr>
-    @endif
     @foreach($orders as $order)
         <tr>
             <td data-sort="{{ $order->type->typeID }}" data-filter="{{ $order->type->typeName }}">
