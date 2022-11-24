@@ -14,10 +14,8 @@
         @if($showOrder ?? false)
             <th>Ordered By</th>
         @endif
-        <th>Character</th>
-        <th>Corporation</th>
-        <th>Alliance</th>
-            <th>Location</th>
+        <th>Producer</th>
+        <th>Location</th>
         <th>Actions</th>
     </tr>
     </thead>
@@ -57,15 +55,9 @@
             <td data-order="{{ $delivery->user->id ?? 0}}" data-filter="{{ $delivery->user->main_character->name ?? trans('web::seat.unknown')}}">
                 @include("web::partials.character",["character"=>$delivery->user->main_character ?? null])
             </td>
-            <td data-order="{{ $delivery->user->main_character->affiliation->corporation_id ?? 0}}" data-filter="{{ $delivery->user->main_character->affiliation->corporation->name ?? trans('web::seat.unknown')}}">
-                @include('web::partials.corporation', ['corporation' => $delivery->user->main_character->affiliation->corporation ?? null])
+            <td data-order="{{ $delivery->order->location_id }}" data-filter="{{ $delivery->order->location()->name }}">
+                @include("allianceindustry::partials.longTextTooltip",["text"=>$delivery->order->location()->name])
             </td>
-            <td data-order="{{ $delivery->user->main_character->affiliation->alliance_id }}" data-filter="{{ $delivery->user->main_character->affiliation->alliance->name ?? trans('web::seat.unknown') }}">
-                @include('web::partials.alliance', ['alliance' => $delivery->user->main_character->affiliation->alliance ?? null])
-            </td>
-                <td data-order="{{ $delivery->order->location_id }}" data-filter="{{ $delivery->order->location()->name }}">
-                    @include("allianceindustry::partials.longTextTooltip",["text"=>$delivery->order->location()->name])
-                </td>
             <td class="d-flex flex-row">
                 @can("allianceindustry.same-user",$delivery->user_id)
                     <form action="{{ route("allianceindustry.setDeliveryState",$delivery->order_id) }}" method="POST" style="width: 50%">

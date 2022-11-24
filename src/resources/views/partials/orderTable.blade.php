@@ -7,8 +7,6 @@
         <th>Unit Price</th>
         <th>Total Price</th>
         <th>Character</th>
-        <th>Corporation</th>
-        <th>Alliance</th>
         <th>Location</th>
         <th>Created</th>
         <th>Until</th>
@@ -37,12 +35,6 @@
             </td>
             <td data-sort="{{ $order->user->id ?? 0 }}" data-filter="{{ $order->user->main_character->name ?? "deleted user"}}">
                 @include("web::partials.character",["character"=>$order->user->main_character ?? null])
-            </td>
-            <td data-sort="{{ $order->user->main_character->affiliation->corporation_id ?? 0}}" data-filter="{{ $order->user->main_character->affiliation->corporation->name ?? trans('web::seat.unknown')}}">
-                @include('web::partials.corporation', ['corporation' => $order->user->main_character->affiliation->corporation ?? null])
-            </td>
-            <td data-sort="{{ $order->user->main_character->affiliation->alliance_id ?? 0}}" data-filter="{{ $order->user->main_character->affiliation->alliance->name ?? trans('web::seat.unknown')}}">
-                @include('web::partials.alliance', ['alliance' => $order->user->main_character->affiliation->alliance ?? null])
             </td>
             <td data-sort="{{ $order->location_id }}" data-filter="{{ $order->location()->name }}">
                 @include("allianceindustry::partials.longTextTooltip",["text"=>$order->location()->name,"length"=>25])
