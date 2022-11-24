@@ -11,6 +11,9 @@
         @endif
         <th>Total Price</th>
         <th>Accepted</th>
+        @if($showOrder ?? false)
+            <th>Ordered By</th>
+        @endif
         <th>Character</th>
         <th>Corporation</th>
         <th>Alliance</th>
@@ -46,6 +49,11 @@
             <td data-order="{{ $delivery->accepted }}" data-filter="_">
                 @include("allianceindustry::partials.time",["date"=>$delivery->accepted])
             </td>
+            @if($showOrder ?? false)
+                <td data-order="{{ $delivery->order->user->id ?? 0}}" data-filter="{{ $delivery->order->user->main_character->name ?? trans('web::seat.unknown')}}">
+                    @include("web::partials.character",["character"=>$delivery->order->user->main_character ?? null])
+                </td>
+            @endif
             <td data-order="{{ $delivery->user->id ?? 0}}" data-filter="{{ $delivery->user->main_character->name ?? trans('web::seat.unknown')}}">
                 @include("web::partials.character",["character"=>$delivery->user->main_character ?? null])
             </td>
