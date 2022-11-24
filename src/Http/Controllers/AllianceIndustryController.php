@@ -7,6 +7,7 @@ use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
 use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
+use RecursiveTree\Seat\TreeLib\Helpers\Parser;
 use Seat\Eveapi\Models\Universe\UniverseStation;
 use Seat\Eveapi\Models\Universe\UniverseStructure;
 use Seat\Web\Http\Controllers\Controller;
@@ -64,29 +65,28 @@ class AllianceIndustryController extends Controller
         }
 
         //parse items
-        $multibuy = preg_replace('~\R~u', "\n", $request->items);
-        $matches = [];
-        preg_match_all("/^(?<item_name>[\w '-]+?)\s+x?(?<item_amount>\d+)(?:\s+-)*(?:\s+(?<item_price>\d+)(?:ISK)?)?$/m",$multibuy, $matches);
+        $parsed_multibuy = Parser::parseMultiBuy($request->items, true);
 
-        //dd($matches);
-
-        //get items
-        $items = [];
-        $manual_items = [];
-        foreach ($matches["item_name"] as $index=>$name){
-            $amount = intval($matches["item_amount"][$index]);
-            if($amount<1) continue;
-
-            $items[] = [
-                "name"=>$matches["item_name"][$index],
-                "quantity"=>$amount
-            ];
-        }
-        if(count($items)<1){
+        //check item count, don't request prices without any items
+        if(count($parsed_multibuy->items)<1){
             $request->session()->flash("warning","You need to add at least 1 item to the delivery");
             return redirect()->route("allianceindustry.orders");
         }
 
+        //transform to evepraisal format and process manual prices
+        $evepraisal_items = [];
+        $manual_prices = [];
+        $i = 0;
+        foreach ($parsed_multibuy->items as $item){
+            $evepraisal_items[] = [
+                "type_id"=>$item->getTypeId(),
+                "quantity"=>$item->getAmount()
+            ];
+
+            $manual_prices[$item->getTypeId()] = $parsed_multibuy->prices[$i++];
+        }
+
+        //appraise on evepraisal
         try {
             $market = SettingHelper::getSetting("marketHub","jita");
 
@@ -97,7 +97,7 @@ class AllianceIndustryController extends Controller
                 'json' => [
                     'market_name' => $market,
                     'persist' => 'false',
-                    'items'=>$items,
+                    'items'=>$evepraisal_items,
                 ]
             ]);
             //decode request
@@ -114,10 +114,9 @@ class AllianceIndustryController extends Controller
         $allowManualPriceBelowAutomatic = SettingHelper::getSetting("allowPriceBelowAutomatic",false);
         $addToSeatInventory = $request->addToSeatInventory !== null;
 
-        $manual_prices = $matches["item_price"];
-        $item_names = $matches["item_name"];
 
         foreach ($data->appraisal->items as $item){
+
             $has_manual_price = false;
 
             $order = new Order();
@@ -128,17 +127,13 @@ class AllianceIndustryController extends Controller
                 $unit_price = $item->prices->buy->max;
             }
 
-            $name = $item->name;
-            $index = array_search($name,$item_names);
-            if($index !== false){
-                $manual_price = $manual_prices[$index];
-                if(strlen($manual_price)>0 && is_numeric($manual_price)){
-                    $manual_price = intval($manual_price);
-                    //don't allow too low prices
-                    if($manual_price > $unit_price || $allowManualPriceBelowAutomatic){
-                        $unit_price = $manual_price;
-                        $has_manual_price = true;
-                    }
+            $manual_price = $manual_prices[$item->typeID] ?? null;
+            if(is_numeric($manual_price)){
+                $manual_price = intval($manual_price);
+                //don't allow too low prices
+                if($manual_price > $unit_price || $allowManualPriceBelowAutomatic){
+                    $unit_price = $manual_price;
+                    $has_manual_price = true;
                 }
             }
 
