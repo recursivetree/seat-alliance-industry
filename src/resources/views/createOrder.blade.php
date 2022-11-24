@@ -22,8 +22,8 @@
                             id="itemsTextarea"
                             name="items"
                             class="form-control"
-                            placeholder="{{"Tristan 100\nOmen 100\nTritanium 30000"}}"
-                            rows="10">{{ $multibuy ?? "" }}</textarea>
+                            placeholder="{{"MULTIBUY:\nTristan 100\nOmen 100\nTritanium 30000\n\nFITTINGS:\n[Pacifier, 2022 Scanner]\n\nCo-Processor II\nCo-Processor II\n\nMultispectrum Shield Hardener II\nMultispectrum Shield Hardener II\n\nSmall Tractor Beam II\nSmall Tractor Beam II"}}"
+                            rows="20">{{ $multibuy ?? "" }}</textarea>
                     </div>
 
                     <div class="form-group">

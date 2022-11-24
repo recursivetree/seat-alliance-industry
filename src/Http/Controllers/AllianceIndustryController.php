@@ -65,10 +65,10 @@ class AllianceIndustryController extends Controller
         }
 
         //parse items
-        $parsed_multibuy = Parser::parseMultiBuy($request->items, true);
+        $parsed_multibuy = Parser::parseFitOrMultiBuy($request->items, true);
 
         //check item count, don't request prices without any items
-        if(count($parsed_multibuy->items)<1){
+        if($parsed_multibuy->items->count()<1){
             $request->session()->flash("warning","You need to add at least 1 item to the delivery");
             return redirect()->route("allianceindustry.orders");
         }
@@ -77,13 +77,14 @@ class AllianceIndustryController extends Controller
         $evepraisal_items = [];
         $manual_prices = [];
         $i = 0;
-        foreach ($parsed_multibuy->items as $item){
+        $manual_price_data = $parsed_multibuy->prices ?? [];
+        foreach ($parsed_multibuy->items->iterate() as $item){
             $evepraisal_items[] = [
                 "type_id"=>$item->getTypeId(),
                 "quantity"=>$item->getAmount()
             ];
 
-            $manual_prices[$item->getTypeId()] = $parsed_multibuy->prices[$i++];
+            $manual_prices[$item->getTypeId()] = $manual_price_data[$i++] ?? null;
         }
 
         //appraise on evepraisal
