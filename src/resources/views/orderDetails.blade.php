@@ -15,7 +15,7 @@
                 @include("allianceindustry::partials.orderTable",["orders"=>collect([$order])])
 
                 @can("allianceindustry.same-user",$order->user_id)
-                    @if($order->deliveries->isEmpty() || $order->completed || auth()->user()->can("allianceindustry.admin"))
+                    @if($order->deliveries->isEmpty() || $order->completed)
                         <form action="{{ route("allianceindustry.deleteOrder") }}" method="POST">
                             @csrf
                             <input type="hidden" name="order" value="{{ $order->id }}">
