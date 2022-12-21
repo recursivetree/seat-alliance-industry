@@ -8,6 +8,8 @@ class AllianceIndustrySettings
 {
     public static $LAST_NOTIFICATION_BATCH;
 
+
+
     //used in an earlier iteration of the notification system, still used in migrations
     public static $NOTIFICATION_COMMAND_SCHEDULE_ID;
 

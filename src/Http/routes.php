@@ -71,6 +71,12 @@ Route::group([
         'middleware' => 'can:allianceindustry.create_orders'
     ]);
 
+    Route::post('/orders/update', [
+        'as'   => 'allianceindustry.updateOrderPrice',
+        'uses' => 'AllianceIndustryController@updateOrderPrice',
+        'middleware' => 'can:allianceindustry.create_orders'
+    ]);
+
     Route::post('/orders/submit', [
         'as'   => 'allianceindustry.submitOrder',
         'uses' => 'AllianceIndustryController@submitOrder',

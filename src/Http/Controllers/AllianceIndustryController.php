@@ -2,12 +2,14 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry\Http\Controllers;
 
-
 use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
 use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
+use RecursiveTree\Seat\AllianceIndustry\Prices\EvePraisalPriceProvider;
+use RecursiveTree\Seat\TreeLib\Helpers\ItemList;
 use RecursiveTree\Seat\TreeLib\Helpers\Parser;
+use RecursiveTree\Seat\TreeLib\Helpers\SimpleItem;
 use Seat\Eveapi\Models\Universe\UniverseStation;
 use Seat\Eveapi\Models\Universe\UniverseStructure;
 use Seat\Web\Http\Controllers\Controller;
@@ -58,7 +60,6 @@ class AllianceIndustryController extends Controller
             return redirect()->route("allianceindustry.createOrder");
         }
 
-
         if(!(UniverseStructure::where("structure_id",$request->location)->exists()||UniverseStation::where("station_id",$request->location)->exists())) {
             $request->session()->flash("error","Could not find structure/station.");
             return redirect()->route("allianceindustry.orders");
@@ -73,40 +74,7 @@ class AllianceIndustryController extends Controller
             return redirect()->route("allianceindustry.orders");
         }
 
-        //transform to evepraisal format and process manual prices
-        $evepraisal_items = [];
-        $manual_prices = [];
-        $i = 0;
-        $manual_price_data = $parsed_multibuy->prices ?? [];
-        foreach ($parsed_multibuy->items->iterate() as $item){
-            $evepraisal_items[] = [
-                "type_id"=>$item->getTypeId(),
-                "quantity"=>$item->getAmount()
-            ];
-
-            $manual_prices[$item->getTypeId()] = $manual_price_data[$i++] ?? null;
-        }
-
-        //appraise on evepraisal
-        try {
-            $market = SettingHelper::getSetting("marketHub","jita");
-
-            $client = new Client([
-                'timeout'  => 5.0,
-            ]);
-            $response = $client->request('POST', "https://evepraisal.com/appraisal/structured.json",[
-                'json' => [
-                    'market_name' => $market,
-                    'persist' => 'false',
-                    'items'=>$evepraisal_items,
-                ]
-            ]);
-            //decode request
-            $data = json_decode( $response->getBody());
-        } catch (GuzzleException $e){
-            $request->session()->flash("error","Failed to load market data.");
-            return redirect()->route("allianceindustry.orders");
-        }
+        $appraised_items = EvePraisalPriceProvider::getPrices($parsed_multibuy->items);
 
         $now = now();
         $produce_until = now()->addDays($request->days);
@@ -116,22 +84,18 @@ class AllianceIndustryController extends Controller
         $addToSeatInventory = $request->addToSeatInventory !== null;
 
 
-        foreach ($data->appraisal->items as $item){
+        foreach ($appraised_items as $item){
 
             $has_manual_price = false;
 
             $order = new Order();
 
-            if($priceType==="sell"){
-                $unit_price = $item->prices->sell->min;
-            } else {
-                $unit_price = $item->prices->buy->max;
-            }
+            $unit_price = $item->getUnitPrice();
 
-            $manual_price = $manual_prices[$item->typeID] ?? null;
+            $manual_price = $manual_prices[$item->getTypeId()] ?? null;
             if(is_numeric($manual_price)){
                 $manual_price = intval($manual_price);
-                //don't allow too low prices
+                //only allow manual prices if they are above real prices, or lower prices are allowed
                 if($manual_price > $unit_price || $allowManualPriceBelowAutomatic){
                     $unit_price = $manual_price;
                     $has_manual_price = true;
@@ -143,14 +107,15 @@ class AllianceIndustryController extends Controller
                 $unit_price = $unit_price * $price_modifier;
             }
 
-            $order->type_id = $item->typeID;
-            $order->quantity = $item->quantity;
+            $order->type_id = $item->getTypeId();
+            $order->quantity = $item->getAmount();
             $order->user_id = auth()->user()->id;
             $order->unit_price = $unit_price;
             $order->location_id = $request->location;
             $order->created_at = $now;
             $order->produce_until = $produce_until;
             $order->add_seat_inventory = $addToSeatInventory;
+            $order->profit = floatval($request->profit);
 
             $order->save();
         }
@@ -160,6 +125,30 @@ class AllianceIndustryController extends Controller
 
         $request->session()->flash("success","Successfully added new order");
         return redirect()->route("allianceindustry.orders");
+    }
+
+    public function updateOrderPrice(Request $request){
+        $request->validate([
+            "order"=>"required|integer"
+        ]);
+        $order = Order::find($request->order);
+        if(!$order){
+            $request->session()->flash("error","The order wasn't found");
+            return redirect()->back();
+        }
+
+        Gate::authorize("allianceindustry.same-user",$order->user_id);
+
+        $profit_multiplier = 1+($order->profit/100.0);
+
+        $prices = EvePraisalPriceProvider::getPrices(new ItemList([new SimpleItem($order->type_id,$order->quantity)]));
+        $price = $prices[0]->getUnitPrice() * $profit_multiplier;
+
+        $order->unit_price = $price;
+        $order->save();
+
+        $request->session()->flash("success","Updated the price!");
+        return redirect()->back();
     }
 
     public function orderDetails($id, Request $request){
