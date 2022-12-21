@@ -40,7 +40,7 @@ class OrderNotificationSlack extends AbstractNotification implements ShouldQueue
                 foreach ($orders as $order){
                     $itemName = $order->type->typeName;
                     $location = $order->location()->name;
-                    $quantity = $order->quantity;
+                    $quantity = number($order->quantity,0);
                     $price = number_metric($order->unit_price);
                     $totalPrice = number_metric($order->unit_price * $order->quantity);
 

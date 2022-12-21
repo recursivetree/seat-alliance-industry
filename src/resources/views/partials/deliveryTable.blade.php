@@ -28,7 +28,7 @@
                 </td>
             @endif
             <td data-order="{{ $delivery->quantity }}" data-filter="_">
-                {{ $delivery->quantity }}
+                {{ number($delivery->quantity,0) }}
             </td>
             <td data-order="{{ $delivery->completed_at?carbon($delivery->completed_at)->timestamp:0 }}" data-filter="_">
                 @include("allianceindustry::partials.boolean",["value"=>$delivery->completed])

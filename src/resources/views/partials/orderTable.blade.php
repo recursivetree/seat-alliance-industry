@@ -19,7 +19,7 @@
                 <a href="{{ route("allianceindustry.orderDetails",$order->id) }}">{{ $order->type->typeName }}</a>
             </td>
             <td data-sort="{{ $order->quantity - $order->assignedQuantity() }}" data-filter="_">
-                {{$order->assignedQuantity()}}/{{ $order->quantity }}
+                {{number($order->assignedQuantity(),0)}}/{{ number($order->quantity,0) }}
             </td>
             <td data-sort="{{ $order->completed_at?carbon($order->completed_at)->timestamp:0 }}" data-filter="_">
                 @include("allianceindustry::partials.boolean",["value"=>$order->completed])
