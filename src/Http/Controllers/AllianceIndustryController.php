@@ -74,15 +74,20 @@ class AllianceIndustryController extends Controller
             return redirect()->route("allianceindustry.orders");
         }
 
+        //extract manual prices
+        $manual_prices = [];
+        $i=0;
+        foreach ($parsed_multibuy->items->iterate() as $item){
+            $manual_prices[$item->getTypeId()] = intval($parsed_multibuy->prices[$i++]);
+        }
+
         $appraised_items = AbstractPriceProvider::getDefaultPriceProvider()::getPrices($parsed_multibuy->items);
 
         $now = now();
         $produce_until = now()->addDays($request->days);
-        $priceType = AllianceIndustrySettings::$PRICE_TYPE->get("buy");
         $price_modifier = (1+(floatval($request->profit)/100.0));
         $allowManualPriceBelowAutomatic = AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->get(false);
         $addToSeatInventory = $request->addToSeatInventory !== null;
-
 
         foreach ($appraised_items as $item){
 
@@ -93,8 +98,7 @@ class AllianceIndustryController extends Controller
             $unit_price = $item->getUnitPrice();
 
             $manual_price = $manual_prices[$item->getTypeId()] ?? null;
-            if(is_numeric($manual_price)){
-                $manual_price = intval($manual_price);
+            if($manual_price){
                 //only allow manual prices if they are above real prices, or lower prices are allowed
                 if($manual_price > $unit_price || $allowManualPriceBelowAutomatic){
                     $unit_price = $manual_price;
