@@ -8,6 +8,13 @@ use RecursiveTree\Seat\TreeLib\Helpers\ItemList;
 abstract class AbstractPriceProvider
 {
     /**
+     * @return AbstractPriceProvider the preferred price provider
+     */
+    public static function getDefaultPriceProvider(){
+        return config('allianceindustry.config.priceProvider');
+    }
+
+    /**
     * @param ItemList $items
     */
     public static abstract function getPrices($items);

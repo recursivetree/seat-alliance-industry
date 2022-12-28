@@ -12,6 +12,8 @@ class AllianceIndustryApi
     public static function create_orders($data){
         $location_id = $data["location"] ?? 60003760;
 
+
+
         $multibuy = "";
         foreach ($data["items"] as $item){
             $type = InvType::find($item["type_id"]);

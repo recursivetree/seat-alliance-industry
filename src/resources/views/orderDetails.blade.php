@@ -28,7 +28,7 @@
                             <form action="{{ route("allianceindustry.updateOrderPrice") }}" method="POST" class="mx-2">
                                 @csrf
                                 <input type="hidden" name="order" value="{{ $order->id }}">
-                                <button type="submit" class="btn btn-success">Update Price</button>
+                                <button type="submit" class="btn btn-success confirmform" data-seat-action="update the price? Manual prices will be overwritten!">Update Price</button>
                             </form>
                         @endif
                     </div>

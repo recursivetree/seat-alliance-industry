@@ -56,6 +56,7 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
         AllianceIndustrySettings::init();
 
         $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.sidebar.php','package.sidebar');
+        $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.php', 'allianceindustry.config');
         $this->registerPermissions(__DIR__ . '/Config/allianceindustry.permissions.php', 'allianceindustry');
     }
 
