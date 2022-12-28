@@ -2,7 +2,7 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry\Http\Controllers;
 
-use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
+use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
@@ -37,7 +37,7 @@ class AllianceIndustryController extends Controller
         $stations = UniverseStation::all();
         $structures = UniverseStructure::all();
 
-        $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
+        $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
 
         $location_id = 60003760;
 
@@ -54,7 +54,7 @@ class AllianceIndustryController extends Controller
             "addToSeatInventory"=>"nullable|in:on"
         ]);
 
-        $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
+        $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
         if($request->profit < $mpp){
             $request->session()->flash("error","The minimal profit can't be lower than $mpp%");
             return redirect()->route("allianceindustry.createOrder");
@@ -78,9 +78,9 @@ class AllianceIndustryController extends Controller
 
         $now = now();
         $produce_until = now()->addDays($request->days);
-        $priceType = SettingHelper::getSetting("priceType","buy");
+        $priceType = AllianceIndustrySettings::$PRICE_TYPE->get("buy");
         $price_modifier = (1+(floatval($request->profit)/100.0));
-        $allowManualPriceBelowAutomatic = SettingHelper::getSetting("allowPriceBelowAutomatic",false);
+        $allowManualPriceBelowAutomatic = AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->get(false);
         $addToSeatInventory = $request->addToSeatInventory !== null;
 
 
@@ -281,11 +281,11 @@ class AllianceIndustryController extends Controller
     }
 
     public function settings(){
-        $marketHub = SettingHelper::getSetting("marketHub","jita");
-        $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
-        $priceType = SettingHelper::getSetting("priceType","buy");
-        $orderCreationPingRoles =  implode(" ", SettingHelper::getSetting("orderCreationPingRoles",[]));
-        $allowPriceBelowAutomatic = SettingHelper::getSetting("allowPriceBelowAutomatic",false);
+        $marketHub = AllianceIndustrySettings::$MARKET_HUB->get("jita");
+        $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
+        $priceType = AllianceIndustrySettings::$PRICE_TYPE->get("buy");
+        $orderCreationPingRoles =  implode(" ", AllianceIndustrySettings::$ORDER_CREATION_PING_ROLES->get([]));
+        $allowPriceBelowAutomatic = AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->get(false);
 
         return view("allianceindustry::settings", compact("marketHub","mpp","priceType", "orderCreationPingRoles","allowPriceBelowAutomatic"));
     }
@@ -309,11 +309,11 @@ class AllianceIndustryController extends Controller
         }
 
 
-        SettingHelper::setSetting("marketHub",$request->market);
-        SettingHelper::setSetting("minimumProfitPercentage", floatval($request->minimumprofitpercentage));
-        SettingHelper::setSetting("priceType",$request->pricetype);
-        SettingHelper::setSetting("orderCreationPingRoles",$roles);
-        SettingHelper::setSetting("allowPriceBelowAutomatic",boolval($request->allowPriceBelowAutomatic));
+        AllianceIndustrySettings::$MARKET_HUB->set($request->market);
+        AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->set(floatval($request->minimumprofitpercentage));
+        AllianceIndustrySettings::$PRICE_TYPE->set($request->pricetype);
+        AllianceIndustrySettings::$ORDER_CREATION_PING_ROLES->set($roles);
+        AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->set(boolval($request->allowPriceBelowAutomatic));
 
         $request->session()->flash("success","Successfully saved settings");
         return redirect()->route("allianceindustry.settings");

@@ -2,7 +2,7 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry\Prices;
 
-use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
+use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use RecursiveTree\Seat\AllianceIndustry\Helpers\SimpleItemWithPrice;
@@ -23,7 +23,7 @@ class EvePraisalPriceProvider extends AbstractPriceProvider
 
         //appraise on evepraisal
         try {
-            $market = SettingHelper::getSetting("marketHub","jita");
+            $market = self::getPreferredMarketHub();
 
             $client = new Client([
                 'timeout'  => 5.0,

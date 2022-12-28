@@ -2,7 +2,7 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry\Notifications;
 
-use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
+use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use Seat\Notifications\Notifications\AbstractNotification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Queue\SerializesModels;
@@ -28,7 +28,7 @@ class OrderNotificationSlack extends AbstractNotification implements ShouldQueue
 
         $pings = implode(" ", array_map(function ($role){
             return "<@&$role>";
-        }, SettingHelper::getSetting("orderCreationPingRoles",[])));
+        }, AllianceIndustrySettings::$ORDER_CREATION_PING_ROLES->get([])));
 
         return (new SlackMessage)
             ->success()

@@ -4,14 +4,12 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
-use Seat\Services\Models\Schedule;
 
 class SavePriceSettings extends Migration
 {
     public function up()
     {
-        $default_price = SettingHelper::getSetting("minimumProfitPercentage",2.5);
+        $default_price = \RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
 
         Schema::table("recursive_tree_seat_alliance_industry_orders",function (Blueprint $table){
             $table->float("profit");

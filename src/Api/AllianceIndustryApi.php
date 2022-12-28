@@ -2,7 +2,7 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry\Api;
 
-use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
+use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use Seat\Eveapi\Models\Universe\UniverseStation;
 use Seat\Eveapi\Models\Universe\UniverseStructure;
 
@@ -15,7 +15,7 @@ class AllianceIndustryApi
 
         $stations = UniverseStation::all();
         $structures = UniverseStructure::all();
-        $mpp = SettingHelper::getSetting("minimumProfitPercentage",2.5);
+        $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
 
         return view("allianceindustry::createOrder",compact("stations", "structures","mpp","location_id","multibuy"));
     }

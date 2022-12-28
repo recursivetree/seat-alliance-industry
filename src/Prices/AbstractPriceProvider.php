@@ -2,7 +2,7 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry\Prices;
 
-use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
+use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use RecursiveTree\Seat\TreeLib\Helpers\ItemList;
 
 abstract class AbstractPriceProvider
@@ -24,13 +24,13 @@ abstract class AbstractPriceProvider
      * returns the system name of the preferred market
     */
     protected static function getPreferredMarketHub(){
-        return SettingHelper::getSetting("marketHub","jita");
+        return AllianceIndustrySettings::$MARKET_HUB->get("jita");
     }
 
     /**
      * @return string either buy or sell
      */
     protected static function getPreferredPriceType(){
-        return SettingHelper::getSetting("priceType","buy");;
+        return AllianceIndustrySettings::$PRICE_TYPE->get("buy");
     }
 }

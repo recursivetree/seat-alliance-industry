@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
 use Seat\Services\Models\Schedule;
 
 class ScheduleOrderNotifications extends Migration
@@ -17,12 +16,12 @@ class ScheduleOrderNotifications extends Migration
         $schedule->allow_maintenance = false;
         $schedule->save();
 
-        SettingHelper::setSetting("notifications_schedule_id",$schedule->id);
+        \RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings::$NOTIFICATION_COMMAND_SCHEDULE_ID->set($schedule->id);
     }
 
     public function down()
     {
-        $id =  SettingHelper::getSetting("notifications_schedule_id",null);
+        $id =  \RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings::$NOTIFICATION_COMMAND_SCHEDULE_ID->get(null);
         if($id){
             Schedule::destroy($id);
         }

@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use RecursiveTree\Seat\AllianceIndustry\Helpers\SettingHelper;
-use Seat\Services\Models\Schedule;
 
 class SeatInventoryIntegration extends Migration
 {
