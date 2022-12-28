@@ -13,7 +13,6 @@ class DeliveryObserver
 
     public static function saving($delivery){
         //delivery is completed, remove the virtual source
-        //if we add a confirm received state, we should do it there
         if ($delivery->completed) {
             self::deleteInventorySource($delivery);
         }
@@ -22,11 +21,16 @@ class DeliveryObserver
             $order = $delivery->order;
             $source = $delivery->seatInventorySource;
             if ($order->add_seat_inventory && $source === null) {
+                $workspace = SeatInventoryPluginHelper::$WORKSPACE_MODEL::where("name","like","%add2allianceindustry%")->first();
+
+                if(!$workspace) return;
+
                 $user_name = $delivery->user->name;
                 $source = new SeatInventoryPluginHelper::$INVENTORY_SOURCE_MODEL();
                 $source->location_id = SeatInventoryPluginHelper::$LOCATION_MODEL::where("structure_id", $order->location_id)->orWhere("station_id", $order->location_id)->first()->id;
                 $source->source_name = "AllianceIndustry Delivery from $user_name";
                 $source->source_type = "alliance_industry_delivery";
+                $source->workspace_id = $workspace->id;
                 $source->save();
 
                 $item = new SeatInventoryPluginHelper::$INVENTORY_ITEM_MODEL();

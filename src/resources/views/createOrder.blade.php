@@ -61,7 +61,12 @@
                                 <input type="checkbox" id="addToSeatInventory" class="form-check-input" checked name="addToSeatInventory">
                                 <label for="addToSeatInventory" class="form-check-label">Add as source to seat-inventory</label>
                             </div>
-                            <small class="text-muted">As soon as a delivery for this order is created, a item source will be added to seat-inventory. Once the delivery is marked as completed, the source will be removed.</small>
+                            <small class="text-muted">
+                                As soon as a delivery for this order is created, a item source will be added to seat-inventory.
+                                Once the delivery is marked as completed, the source will be removed.
+                                The source will be added to the <u>first</u> workspace containing <code>add2allianceindustry</code> at any position in it's name.
+                                You can rename workspaces <a href="{{ route("inventory.settings") }}">here.</a>
+                            </small>
                         </div>
                     @endif
 
