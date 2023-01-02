@@ -77,3 +77,12 @@
         </div>
     </div>
 @stop
+@push("javascript")
+    <script>
+        $(document).ready( function () {
+            $("#location").select2()
+            $('[data-toggle="tooltip"]').tooltip()
+            $('.data-table').DataTable();
+        });
+    </script>
+@endpush
