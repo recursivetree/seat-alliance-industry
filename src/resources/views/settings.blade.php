@@ -44,6 +44,21 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="defaultLocation">Default Location</label>
+                        <select id="defaultLocation" class="form-control" name="defaultLocation">
+                            @foreach($stations as $station)
+                                <option value="{{ $station->station_id }}" @selected($station->station_id == $defaultOrderLocation )>{{ $station->name }}</option>
+                            @endforeach
+                            @foreach($structures as $structure)
+                                <option value="{{ $structure->structure_id }}" @selected($structure->structure_id == $defaultOrderLocation )>{{ $structure->name }}</option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">
+                            Controls the preselected location when creating new orders
+                        </small>
+                    </div>
+
+                    <div class="form-group">
                         <label for="mpp">Minimum Profit Percentage</label>
                         <input type="number" value="{{ $mpp }}" min="0" step="0.1" id="mpp" name="minimumprofitpercentage" class="form-control">
                         <small class="text-muted">To incentive production, the plugin applies this % of the item value on top of the price. While creating an order, you can always choose to give a higher profit, but to avoid players ripping off others, they can't go below this value.</small>
@@ -70,3 +85,12 @@
         </div>
     </div>
 @stop
+@push("javascript")
+    <script>
+        $(document).ready( function () {
+            $("#defaultLocation").select2()
+            $('[data-toggle="tooltip"]').tooltip()
+            $('.data-table').DataTable();
+        });
+    </script>
+@endpush

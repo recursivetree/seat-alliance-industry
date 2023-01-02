@@ -39,7 +39,7 @@ class AllianceIndustryController extends Controller
 
         $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
 
-        $location_id = 60003760;
+        $location_id = AllianceIndustrySettings::$DEFAULT_ORDER_LOCATION->get(60003760);//jita
 
         return view("allianceindustry::createOrder",compact("stations", "structures","mpp","location_id"));
     }
@@ -285,13 +285,17 @@ class AllianceIndustryController extends Controller
     }
 
     public function settings(){
+        $stations = UniverseStation::all();
+        $structures = UniverseStructure::all();
+
+        $defaultOrderLocation = AllianceIndustrySettings::$DEFAULT_ORDER_LOCATION->get(60003760);
         $marketHub = AllianceIndustrySettings::$MARKET_HUB->get("jita");
         $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
         $priceType = AllianceIndustrySettings::$PRICE_TYPE->get("buy");
         $orderCreationPingRoles =  implode(" ", AllianceIndustrySettings::$ORDER_CREATION_PING_ROLES->get([]));
         $allowPriceBelowAutomatic = AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->get(false);
 
-        return view("allianceindustry::settings", compact("marketHub","mpp","priceType", "orderCreationPingRoles","allowPriceBelowAutomatic"));
+        return view("allianceindustry::settings", compact("marketHub","mpp","priceType", "orderCreationPingRoles","allowPriceBelowAutomatic","stations","structures","defaultOrderLocation"));
     }
 
     public function saveSettings(Request $request){
@@ -300,7 +304,8 @@ class AllianceIndustryController extends Controller
             "pricetype"=>"required|in:sell,buy",
             "minimumprofitpercentage"=>"required|numeric|min:0",
             "pingRolesOrderCreation"=>"string|nullable",
-            "allowPriceBelowAutomatic"=>"nullable|in:on"
+            "allowPriceBelowAutomatic"=>"nullable|in:on",
+            "defaultLocation"=>"required|integer"
         ]);
 
         $roles = [];
@@ -318,6 +323,7 @@ class AllianceIndustryController extends Controller
         AllianceIndustrySettings::$PRICE_TYPE->set($request->pricetype);
         AllianceIndustrySettings::$ORDER_CREATION_PING_ROLES->set($roles);
         AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->set(boolval($request->allowPriceBelowAutomatic));
+        AllianceIndustrySettings::$DEFAULT_ORDER_LOCATION->set($request->defaultLocation);
 
         $request->session()->flash("success","Successfully saved settings");
         return redirect()->route("allianceindustry.settings");
