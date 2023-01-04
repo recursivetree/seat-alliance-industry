@@ -17,7 +17,7 @@ class EvePraisalPriceProvider extends AbstractPriceProvider
         foreach ($items->iterate() as $item){
             $evepraisal_request[] = [
                 "type_id"=>$item->getTypeId(),
-                "quantity"=>1
+                "quantity"=>$item->getAmount()
             ];
         }
 
