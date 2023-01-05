@@ -18,28 +18,31 @@ class DeliveryObserver
         }
         //create/update the delivery
         else {
-            $order = $delivery->order;
-            $source = $delivery->seatInventorySource;
-            if ($order->add_seat_inventory && $source === null) {
-                $workspace = SeatInventoryPluginHelper::$WORKSPACE_MODEL::where("name","like","%add2allianceindustry%")->first();
 
-                if(!$workspace) return;
+            if(SeatInventoryPluginHelper::pluginIsAvailable()) {
+                $order = $delivery->order;
+                $source = $delivery->seatInventorySource;
+                if ($order->add_seat_inventory && $source === null) {
+                    $workspace = SeatInventoryPluginHelper::$WORKSPACE_MODEL::where("name", "like", "%add2allianceindustry%")->first();
 
-                $user_name = $delivery->user->name;
-                $source = new SeatInventoryPluginHelper::$INVENTORY_SOURCE_MODEL();
-                $source->location_id = SeatInventoryPluginHelper::$LOCATION_MODEL::where("structure_id", $order->location_id)->orWhere("station_id", $order->location_id)->first()->id;
-                $source->source_name = "AllianceIndustry Delivery from $user_name";
-                $source->source_type = "alliance_industry_delivery";
-                $source->workspace_id = $workspace->id;
-                $source->save();
+                    if (!$workspace) return;
 
-                $item = new SeatInventoryPluginHelper::$INVENTORY_ITEM_MODEL();
-                $item->source_id = $source->id;
-                $item->type_id = $order->type_id;
-                $item->amount = $delivery->quantity;
-                $item->save();
+                    $user_name = $delivery->user->name;
+                    $source = new SeatInventoryPluginHelper::$INVENTORY_SOURCE_MODEL();
+                    $source->location_id = SeatInventoryPluginHelper::$LOCATION_MODEL::where("structure_id", $order->location_id)->orWhere("station_id", $order->location_id)->first()->id;
+                    $source->source_name = "AllianceIndustry Delivery from $user_name";
+                    $source->source_type = "alliance_industry_delivery";
+                    $source->workspace_id = $workspace->id;
+                    $source->save();
 
-                $delivery->seat_inventory_source = $source->id;
+                    $item = new SeatInventoryPluginHelper::$INVENTORY_ITEM_MODEL();
+                    $item->source_id = $source->id;
+                    $item->type_id = $order->type_id;
+                    $item->amount = $delivery->quantity;
+                    $item->save();
+
+                    $delivery->seat_inventory_source = $source->id;
+                }
             }
         }
     }
@@ -52,12 +55,14 @@ class DeliveryObserver
 
     private static function deleteInventorySource($delivery)
     {
-        if ($delivery->seatInventorySource) {
-            foreach ($delivery->seatInventorySource->items as $item) {
-                $item->delete();
+        if(SeatInventoryPluginHelper::pluginIsAvailable()) {
+            if ($delivery->seatInventorySource) {
+                foreach ($delivery->seatInventorySource->items as $item) {
+                    $item->delete();
+                }
+                $delivery->seatInventorySource->delete();
+                $delivery->seat_inventory_source = null;
             }
-            $delivery->seatInventorySource->delete();
-            $delivery->seat_inventory_source = null;
         }
     }
 

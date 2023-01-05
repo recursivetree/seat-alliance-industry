@@ -9,6 +9,7 @@ use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use RecursiveTree\Seat\AllianceIndustry\Prices\AbstractPriceProvider;
 use RecursiveTree\Seat\TreeLib\Helpers\ItemList;
 use RecursiveTree\Seat\TreeLib\Helpers\Parser;
+use RecursiveTree\Seat\TreeLib\Helpers\SeatInventoryPluginHelper;
 use RecursiveTree\Seat\TreeLib\Helpers\SimpleItem;
 use Seat\Eveapi\Models\Universe\UniverseStation;
 use Seat\Eveapi\Models\Universe\UniverseStructure;
@@ -88,6 +89,9 @@ class AllianceIndustryController extends Controller
         $price_modifier = (1+(floatval($request->profit)/100.0));
         $allowManualPriceBelowAutomatic = AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->get(false);
         $addToSeatInventory = $request->addToSeatInventory !== null;
+        if(!SeatInventoryPluginHelper::pluginIsAvailable()){
+            $addToSeatInventory = false;
+        }
 
         foreach ($appraised_items as $item){
 
