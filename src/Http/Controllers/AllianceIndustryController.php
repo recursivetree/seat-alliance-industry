@@ -52,7 +52,8 @@ class AllianceIndustryController extends Controller
             "days"=>"required|integer|min:1",
             "location"=>"required|integer",
             "addProfitToManualPrices"=>"nullable|in:on",
-            "addToSeatInventory"=>"nullable|in:on"
+            "addToSeatInventory"=>"nullable|in:on",
+            "priority"=>"required|integer"
         ]);
 
         $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
@@ -124,6 +125,7 @@ class AllianceIndustryController extends Controller
             $order->produce_until = $produce_until;
             $order->add_seat_inventory = $addToSeatInventory;
             $order->profit = floatval($request->profit);
+            $order->priority = $request->priority;
 
             $order->save();
         }

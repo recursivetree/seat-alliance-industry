@@ -54,6 +54,15 @@
                         </select>
                     </div>
 
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" class="form-control" name="priority">
+                        @foreach(\RecursiveTree\Seat\TreeLib\Helpers\PrioritySystem::getPriorityData() as $priority=>$data)
+                            <option value="{{$priority}}">{{$data["name"]}}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                     @if(\RecursiveTree\Seat\TreeLib\Helpers\SeatInventoryPluginHelper::pluginIsAvailable())
                         <div class="form-group">
                             <label for="addToSeatInventory">Seat-Inventory</label>

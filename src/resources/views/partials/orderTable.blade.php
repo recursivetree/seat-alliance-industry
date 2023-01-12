@@ -1,6 +1,7 @@
 <table class="data-table table table-striped table-hover">
     <thead>
     <tr>
+        <th>Priority</th>
         <th>Order</th>
         <th>Quantity</th>
         <th>Completed</th>
@@ -8,13 +9,15 @@
         <th>Total Price</th>
         <th>Character</th>
         <th>Location</th>
-        <th>Created</th>
         <th>Until</th>
     </tr>
     </thead>
     <tbody>
     @foreach($orders as $order)
         <tr>
+            <td data-sort="{{ $order->priority }}" data-filter="_">
+                @include("treelib::partials.priority",["priority"=>$order->priority])
+            </td>
             <td data-sort="{{ $order->type->typeID }}" data-filter="{{ $order->type->typeName }}">
                 <a href="{{ route("allianceindustry.orderDetails",$order->id) }}">{{ $order->type->typeName }}</a>
             </td>
@@ -38,9 +41,6 @@
             </td>
             <td data-sort="{{ $order->location_id }}" data-filter="{{ $order->location()->name }}">
                 @include("allianceindustry::partials.longTextTooltip",["text"=>$order->location()->name,"length"=>25])
-            </td>
-            <td data-sort="{{ carbon($order->created_at)->timestamp }}" data-filter="_">
-                @include("allianceindustry::partials.time",["date"=>$order->created_at])
             </td>
             <td data-sort="{{ carbon($order->produce_until)->timestamp }}" data-filter="_">
                 @include("allianceindustry::partials.time",["date"=>$order->produce_until])
