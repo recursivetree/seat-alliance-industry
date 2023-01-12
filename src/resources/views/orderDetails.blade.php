@@ -16,7 +16,7 @@
 
                 @can("allianceindustry.same-user",$order->user_id)
                     <div class="d-flex flex-row">
-                        @if($order->deliveries->isEmpty() || $order->completed)
+                        @if($order->deliveries->isEmpty() || !$order->hasPendingDeliveries() || $order->completed || user()->can("global.superuser") || user()->can("allianceindustry.admin"))
                             <form action="{{ route("allianceindustry.deleteOrder") }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="order" value="{{ $order->id }}">

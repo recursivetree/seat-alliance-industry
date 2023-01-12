@@ -44,4 +44,8 @@ class Order extends Model
     public function assignedQuantity(){
         return $this->deliveries->sum("quantity");
     }
+
+    public function hasPendingDeliveries(){
+        return $this->deliveries()->where("completed",false)->exists();
+    }
 }
