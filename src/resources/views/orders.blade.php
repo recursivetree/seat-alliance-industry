@@ -43,7 +43,7 @@
         $(document).ready( function () {
             $('[data-toggle="tooltip"]').tooltip()
             $('.data-table').DataTable({
-                stateSave: true
+                stateSave: true,
             });
         });
     </script>

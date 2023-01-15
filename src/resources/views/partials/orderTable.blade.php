@@ -9,6 +9,7 @@
         <th>Total Price</th>
         <th>Character</th>
         <th>Location</th>
+        <th>Created</th>
         <th>Until</th>
     </tr>
     </thead>
@@ -41,6 +42,9 @@
             </td>
             <td data-sort="{{ $order->location_id }}" data-filter="{{ $order->location()->name }}">
                 @include("allianceindustry::partials.longTextTooltip",["text"=>$order->location()->name,"length"=>25])
+            </td>
+            <td data-sort="{{ carbon($order->created_at)->timestamp }}" data-filter="_">
+                @include("allianceindustry::partials.time",["date"=>$order->created_at])
             </td>
             <td data-sort="{{ carbon($order->produce_until)->timestamp }}" data-filter="_">
                 @include("allianceindustry::partials.time",["date"=>$order->produce_until])
