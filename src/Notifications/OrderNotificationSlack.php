@@ -3,6 +3,7 @@
 namespace RecursiveTree\Seat\AllianceIndustry\Notifications;
 
 use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
+use RecursiveTree\Seat\TreeLib\Helpers\PrioritySystem;
 use Seat\Notifications\Notifications\AbstractNotification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Queue\SerializesModels;
@@ -30,28 +31,33 @@ class OrderNotificationSlack extends AbstractNotification implements ShouldQueue
             return "<@&$role>";
         }, AllianceIndustrySettings::$ORDER_CREATION_PING_ROLES->get([])));
 
-        return (new SlackMessage)
+        $message = (new SlackMessage)
             ->success()
-            ->from("SeAT Alliance Industry Marketplace")
-            ->content("$pings New orders have been put up.")
-            ->attachment(function ($attachment) use ($orders) {
+            ->from("SeAT Alliance Industry");
+
+        if($pings !== "") {
+            $message->content($pings);
+        }
+
+        $message->attachment(function ($attachment) use ($orders) {
                 $attachment
-                    ->title("View on SeAT",  route("allianceindustry.orders"));
+                    ->title("New SeAT Alliance Industry Orders:",  route("allianceindustry.orders"));
                 foreach ($orders as $order){
                     $itemName = $order->type->typeName;
                     $location = $order->location()->name;
                     $quantity = number($order->quantity,0);
                     $price = number_metric($order->unit_price);
                     $totalPrice = number_metric($order->unit_price * $order->quantity);
+                    $priority = PrioritySystem::getPriorityData()[$order->priority]["name"] ?? trans("seat.web.unknown");
 
-                    $attachment->field(function ($field) use ($totalPrice, $price, $quantity, $location, $itemName) {
+                    $attachment->field(function ($field) use ($priority, $totalPrice, $price, $quantity, $location, $itemName) {
                         $field
                             ->long()
                             ->title("$quantity $itemName(s)")
-                            ->content("$price ISK/unit |  $totalPrice ISK total  | $location");
+                            ->content("Priority: $priority | $price ISK/unit |  $totalPrice ISK total  | $location");
                     });
                 }
             });
-
+        return $message;
     }
 }
