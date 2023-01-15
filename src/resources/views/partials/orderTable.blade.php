@@ -2,15 +2,15 @@
     <thead>
     <tr>
         <th>Priority</th>
-        <th>Order</th>
         <th>Quantity</th>
+        <th>Order</th>
         <th>Completed</th>
         <th>Unit Price</th>
         <th>Total Price</th>
-        <th>Character</th>
         <th>Location</th>
         <th>Created</th>
         <th>Until</th>
+        <th>Character</th>
     </tr>
     </thead>
     <tbody>
@@ -37,9 +37,6 @@
             <td data-sort="{{ $order->unit_price * $order->quantity }}" data-filter="_">
                 {{ number($order->unit_price * $order->quantity) }} ISK
             </td>
-            <td data-sort="{{ $order->user->id ?? 0 }}" data-filter="{{ $order->user->main_character->name ?? "deleted user"}}">
-                @include("web::partials.character",["character"=>$order->user->main_character ?? null])
-            </td>
             <td data-sort="{{ $order->location_id }}" data-filter="{{ $order->location()->name }}">
                 @include("allianceindustry::partials.longTextTooltip",["text"=>$order->location()->name,"length"=>25])
             </td>
@@ -48,6 +45,9 @@
             </td>
             <td data-sort="{{ carbon($order->produce_until)->timestamp }}" data-filter="_">
                 @include("allianceindustry::partials.time",["date"=>$order->produce_until])
+            </td>
+            <td data-sort="{{ $order->user->id ?? 0 }}" data-filter="{{ $order->user->main_character->name ?? "deleted user"}}">
+                @include("web::partials.character",["character"=>$order->user->main_character ?? null])
             </td>
         </tr>
     @endforeach
