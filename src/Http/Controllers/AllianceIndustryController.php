@@ -78,9 +78,11 @@ class AllianceIndustryController extends Controller
 
         //extract manual prices
         $manual_prices = [];
-        $i=0;
-        foreach ($parsed_multibuy->items->iterate() as $item){
-            $manual_prices[$item->getTypeId()] = intval($parsed_multibuy->prices[$i++]);
+        if(property_exists($parsed_multibuy,"prices")) {
+            $i = 0;
+            foreach ($parsed_multibuy->items->iterate() as $item) {
+                $manual_prices[$item->getTypeId()] = intval($parsed_multibuy->prices[$i++]);
+            }
         }
 
         $appraised_items = AbstractPriceProvider::getDefaultPriceProvider()::getPrices($parsed_multibuy->items);
