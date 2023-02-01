@@ -78,7 +78,7 @@ class AllianceIndustryController extends Controller
 
         //extract manual prices
         $manual_prices = [];
-        if(property_exists($parsed_multibuy,"prices")) {
+        if(property_exists($parsed_multibuy,"prices") && $parsed_multibuy->prices!==null) {
             $i = 0;
             foreach ($parsed_multibuy->items->iterate() as $item) {
                 $manual_prices[$item->getTypeId()] = intval($parsed_multibuy->prices[$i++]);
