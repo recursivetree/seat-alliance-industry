@@ -2,8 +2,8 @@
     <thead>
     <tr>
         <th>Priority</th>
-        <th>Quantity</th>
         <th>Order</th>
+        <th>Quantity</th>
         <th>Completed</th>
         <th>Unit Price</th>
         <th>Total Price</th>
