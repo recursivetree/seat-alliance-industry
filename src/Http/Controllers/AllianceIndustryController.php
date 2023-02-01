@@ -6,7 +6,7 @@ use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
-use RecursiveTree\Seat\AllianceIndustry\Prices\AbstractPriceProvider;
+use RecursiveTree\Seat\AllianceIndustry\Prices\AllianceIndustryPriceSettings;
 use RecursiveTree\Seat\TreeLib\Helpers\ItemList;
 use RecursiveTree\Seat\TreeLib\Helpers\Parser;
 use RecursiveTree\Seat\TreeLib\Helpers\SeatInventoryPluginHelper;
@@ -85,7 +85,7 @@ class AllianceIndustryController extends Controller
             }
         }
 
-        $appraised_items = AbstractPriceProvider::getDefaultPriceProvider()::getPrices($parsed_multibuy->items);
+        $appraised_items = config('allianceindustry.config.priceProvider')::getPrices($parsed_multibuy->items, new AllianceIndustryPriceSettings());
 
         $now = now();
         $produce_until = now()->addDays($request->days);
@@ -153,7 +153,8 @@ class AllianceIndustryController extends Controller
 
         $profit_multiplier = 1+($order->profit/100.0);
 
-        $prices = AbstractPriceProvider::getDefaultPriceProvider()::getPrices(new ItemList([new SimpleItem($order->type_id,$order->quantity)]));
+        $item_list = new ItemList([new SimpleItem($order->type_id,$order->quantity)]);
+        $prices = config('allianceindustry.config.priceProvider')::getPrices($item_list, new AllianceIndustryPriceSettings());
         $price = $prices[0]->getUnitPrice() * $profit_multiplier;
 
         $order->unit_price = $price;

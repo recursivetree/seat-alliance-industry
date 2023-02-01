@@ -1,5 +1,5 @@
 <?php
 
 return [
-    "priceProvider"=>"\RecursiveTree\Seat\AllianceIndustry\Prices\EvePraisalPriceProvider"
+    "priceProvider"=>"\RecursiveTree\Seat\TreeLib\Prices\EvePraisalPriceProvider"
 ];
