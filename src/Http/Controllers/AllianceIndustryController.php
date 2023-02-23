@@ -7,10 +7,9 @@ use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use RecursiveTree\Seat\AllianceIndustry\Prices\AllianceIndustryPriceSettings;
-use RecursiveTree\Seat\TreeLib\Helpers\ItemList;
-use RecursiveTree\Seat\TreeLib\Helpers\Parser;
 use RecursiveTree\Seat\TreeLib\Helpers\SeatInventoryPluginHelper;
-use RecursiveTree\Seat\TreeLib\Helpers\SimpleItem;
+use RecursiveTree\Seat\TreeLib\Items\EveItem;
+use RecursiveTree\Seat\TreeLib\Parser\Parser;
 use Seat\Eveapi\Models\Universe\UniverseStation;
 use Seat\Eveapi\Models\Universe\UniverseStructure;
 use Seat\Web\Http\Controllers\Controller;
@@ -68,60 +67,41 @@ class AllianceIndustryController extends Controller
         }
 
         //parse items
-        $parsed_multibuy = Parser::parseFitOrMultiBuy($request->items, true);
+        $parser_result = Parser::parseItems($request->items);
 
         //check item count, don't request prices without any items
-        if($parsed_multibuy->items->count()<1){
+        if($parser_result == null || $parser_result->items->isEmpty()){
             $request->session()->flash("warning","You need to add at least 1 item to the delivery");
             return redirect()->route("allianceindustry.orders");
         }
 
-        //extract manual prices
-        $manual_prices = [];
-        if(property_exists($parsed_multibuy,"prices") && $parsed_multibuy->prices!==null) {
-            $i = 0;
-            foreach ($parsed_multibuy->items->iterate() as $item) {
-                $manual_prices[$item->getTypeId()] = intval($parsed_multibuy->prices[$i++]);
-            }
-        }
-
-        $appraised_items = config('allianceindustry.config.priceProvider')::getPrices($parsed_multibuy->items, new AllianceIndustryPriceSettings());
+        $appraised_items = config('allianceindustry.config.priceProvider')::getPrices($parser_result->items, new AllianceIndustryPriceSettings());
 
         $now = now();
         $produce_until = now()->addDays($request->days);
         $price_modifier = (1+(floatval($request->profit)/100.0));
-        $allowManualPriceBelowAutomatic = AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->get(false);
+        $prohibitManualPricesBelowValue = !AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->get(false);
         $addToSeatInventory = $request->addToSeatInventory !== null;
+        $addProfitToManualPrice = $request->addProfitToManualPrices == "on";
         if(!SeatInventoryPluginHelper::pluginIsAvailable()){
             $addToSeatInventory = false;
         }
 
         foreach ($appraised_items as $item){
-
-            $has_manual_price = false;
-
             $order = new Order();
 
-            $unit_price = $item->getUnitPrice();
-
-            $manual_price = $manual_prices[$item->getTypeId()] ?? null;
-            if($manual_price){
-                //only allow manual prices if they are above real prices, or lower prices are allowed
-                if($manual_price > $unit_price || $allowManualPriceBelowAutomatic){
-                    $unit_price = $manual_price;
-                    $has_manual_price = true;
-                }
+            if($item->manualPrice !== null && $item->manualPrice < $item->marketPrice && $prohibitManualPricesBelowValue){
+                $item->price = $item->marketPrice;
             }
 
-
-            if(!($has_manual_price && !$request->addProfitToManualPrices)){
-                $unit_price = $unit_price * $price_modifier;
+            if($item->manualPrice == null || $addProfitToManualPrice){
+                $item->price *= $price_modifier;
             }
 
-            $order->type_id = $item->getTypeId();
-            $order->quantity = $item->getAmount();
+            $order->type_id = $item->typeModel->typeID;
+            $order->quantity = $item->amount;
             $order->user_id = auth()->user()->id;
-            $order->unit_price = $unit_price;
+            $order->unit_price = $item->price;
             $order->location_id = $request->location;
             $order->created_at = $now;
             $order->produce_until = $produce_until;
@@ -153,9 +133,9 @@ class AllianceIndustryController extends Controller
 
         $profit_multiplier = 1+($order->profit/100.0);
 
-        $item_list = new ItemList([new SimpleItem($order->type_id,$order->quantity)]);
-        $prices = config('allianceindustry.config.priceProvider')::getPrices($item_list, new AllianceIndustryPriceSettings());
-        $price = $prices[0]->getUnitPrice() * $profit_multiplier;
+        $item_list = collect([new EveItem($order->type)]);
+        $item = config('allianceindustry.config.priceProvider')::getPrices($item_list, new AllianceIndustryPriceSettings())->first();
+        $price = $item->price * $profit_multiplier;
 
         $order->unit_price = $price;
         $order->save();
