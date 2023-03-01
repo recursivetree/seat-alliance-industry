@@ -77,6 +77,12 @@ Route::group([
         'middleware' => 'can:allianceindustry.create_orders'
     ]);
 
+    Route::post('/orders/extend', [
+        'as'   => 'allianceindustry.extendOrderPrice',
+        'uses' => 'AllianceIndustryController@extendOrderPrice',
+        'middleware' => 'can:allianceindustry.create_orders'
+    ]);
+
     Route::post('/orders/submit', [
         'as'   => 'allianceindustry.submitOrder',
         'uses' => 'AllianceIndustryController@submitOrder',

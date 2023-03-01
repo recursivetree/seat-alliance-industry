@@ -17,7 +17,7 @@
                 @can("allianceindustry.same-user",$order->user_id)
                     <div class="d-flex flex-row">
                         @if($order->deliveries->isEmpty() || !$order->hasPendingDeliveries() || $order->completed || auth()->user()->can("allianceindustry.admin"))
-                            <form action="{{ route("allianceindustry.deleteOrder") }}" method="POST">
+                            <form action="{{ route("allianceindustry.deleteOrder") }}" method="POST" class="mx-1">
                                 @csrf
                                 <input type="hidden" name="order" value="{{ $order->id }}">
                                 <button type="submit" class="btn btn-danger">Close this Order</button>
@@ -25,12 +25,23 @@
                         @endif
 
                         @if(!$order->completed)
-                            <form action="{{ route("allianceindustry.updateOrderPrice") }}" method="POST" class="mx-2">
+                            <form action="{{ route("allianceindustry.updateOrderPrice") }}" method="POST" class="mx-1">
                                 @csrf
                                 <input type="hidden" name="order" value="{{ $order->id }}">
-                                <button type="submit" class="btn btn-success confirmform" data-seat-action="update the price? Manual prices will be overwritten!">Update Price</button>
+                                <button type="submit" class="btn btn-secondary confirmform"
+                                        data-seat-action="update the price? Manual prices will be overwritten!">Update
+                                    Price
+                                </button>
                             </form>
                         @endif
+
+                        <form action="{{ route("allianceindustry.extendOrderPrice") }}" method="POST" class="mx-1">
+                            @csrf
+                            <input type="hidden" name="order" value="{{ $order->id }}">
+                            <button type="submit" class="btn btn-secondary confirmform"
+                                    data-seat-action=" want to expand the time to deliver by 1 week">Extend Time
+                            </button>
+                        </form>
                     </div>
 
                 @endcan
@@ -86,7 +97,7 @@
 
 @push("javascript")
     <script>
-        $(document).ready( function () {
+        $(document).ready(function () {
             $('[data-toggle="tooltip"]').tooltip()
             $('.data-table').DataTable({
                 stateSave: true
