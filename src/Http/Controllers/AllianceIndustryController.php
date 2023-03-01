@@ -139,7 +139,7 @@ class AllianceIndustryController extends Controller
 
         Gate::authorize("allianceindustry.same-user", $order->user_id);
 
-        $order->produce_until = carbon($order->produce_until)->addWeeks(1);
+        $order->produce_until = now()->addWeeks(1);
         $order->save();
 
         $request->session()->flash("success", "Updated extended the time!");
