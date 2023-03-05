@@ -17,7 +17,8 @@ class BuildTimePriceProvider extends AbstractPriceProvider
 
         return $items->map(function ($item) use ($config){
             $job = DB::table("industryActivityProducts")
-                ->select("time","industryActivity.activityID")
+                ->select("industryActivity.activityID")
+                ->selectRaw("time/quantity as time")
                 ->where("productTypeID",$item->typeModel->typeID)
                 ->join("industryActivity","industryActivityProducts.typeID","industryActivity.typeID")
                 ->first();
