@@ -95,6 +95,18 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="industryTimeCost1">Manufacturing ISK time modifier</label>
+                        <input type="number" id="industryTimeCost1" name="industryTimeCostManufacturingModifier" class="form-control" value="{{ $industryTimeCostManufacturingModifier }}" min="0">
+                        <small class="text-muted">Manufacturing ISK modifier for the <i>Item Build Time</i> price provider in ISK/s.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="industryTimeCost2">Reaction ISK time modifier</label>
+                        <input type="number" id="industryTimeCost2" name="industryTimeCostReactionsModifier" class="form-control" value="{{ $industryTimeCostReactionsModifier }}" min="0">
+                        <small class="text-muted">Reaction ISK modifier for the <i>Item Build Time</i> price provider in ISK/s.</small>
+                    </div>
+
+                    <div class="form-group">
                         <button type="submit" class="btn btn-primary">Update Settings</button>
                     </div>
                 </form>

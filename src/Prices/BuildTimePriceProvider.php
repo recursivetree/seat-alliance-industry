@@ -2,6 +2,7 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry\Prices;
 
+use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use RecursiveTree\Seat\AllianceIndustry\Models\IndustryJob;
 use RecursiveTree\Seat\TreeLib\Prices\AbstractPriceProvider;
 use RecursiveTree\Seat\TreeLib\Prices\Illuminate;
@@ -12,16 +13,18 @@ class BuildTimePriceProvider extends AbstractPriceProvider
 
     public static function getPrices($items, $settings)
     {
-        return $items->map(function ($item){
+        $config = AllianceIndustrySettings::$MANUFACTURING_TIME_COST_MULTIPLIERS->get([]);
+
+        return $items->map(function ($item) use ($config){
             $job = DB::table("industryActivityProducts")
                 ->select("time","industryActivity.activityID")
                 ->where("productTypeID",$item->typeModel->typeID)
                 ->join("industryActivity","industryActivityProducts.typeID","industryActivity.typeID")
                 ->first();
             $time = $job->time ?? 0;
-            $activity = $job->activityID ?? 0;
+            $modifier = $config[ $job->activityID] ?? 0;
 
-            $price = $time;
+            $price = $time * $modifier;
 
             if($item->price == null) {
                 $item->price = $price;
