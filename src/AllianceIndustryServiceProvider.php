@@ -50,13 +50,15 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
         $this->mergeConfigFrom(
             __DIR__ . '/Config/inventory.sources.php', 'inventory.sources'
         );
+
+        $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.sde.tables.php','seat.sde.tables');
+        $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.priceproviders.php','treelib.priceproviders');
     }
 
     public function register(){
         AllianceIndustrySettings::init();
 
         $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.sidebar.php','package.sidebar');
-        $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.php', 'allianceindustry.config');
         $this->registerPermissions(__DIR__ . '/Config/allianceindustry.permissions.php', 'allianceindustry');
     }
 

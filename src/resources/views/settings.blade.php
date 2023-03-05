@@ -44,6 +44,14 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="priceprovider">Default Price Provider</label>
+                        <select id="priceprovider" class="form-control" name="defaultPriceProvider">
+                            <option value="{{ $default_price_provider['class'] }}" selected>{{$default_price_provider['name']}}</option>
+                        </select>
+                        <small class="text-muted">The default price provider for orders.</small>
+                    </div>
+
+                    <div class="form-group">
                         <label for="defaultLocation">Default Location</label>
                         <select id="defaultLocation" class="form-control" name="defaultLocation">
                             @foreach($stations as $station)
@@ -63,12 +71,21 @@
                         <input type="number" value="{{ $mpp }}" min="0" step="0.1" id="mpp" name="minimumprofitpercentage" class="form-control">
                         <small class="text-muted">To incentive production, the plugin applies this % of the item value on top of the price. While creating an order, you can always choose to give a higher profit, but to avoid players ripping off others, they can't go below this value.</small>
                     </div>
+
                     <div class="form-group">
                         <div class="form-check">
                             <input type="checkbox" id="allowPriceBelowAutomatic" class="form-check-input" name="allowPriceBelowAutomatic" @checked($allowPriceBelowAutomatic)>
                             <label for="allowPriceBelowAutomatic" class="form-check-label">Allow Manual Prices below automatic Prices</label>
                         </div>
                         <small class="text-muted">To avoid scam orders, manual prices are ignored if they are for less than the automatic price.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" id="allowPriceProviderSelection" class="form-check-input" name="allowPriceProviderSelection" @checked($allowPriceProviderSelection)>
+                            <label for="allowPriceProviderSelection" class="form-check-label">Allows users to change the price provider when creating orders</label>
+                        </div>
+                        <small class="text-muted">To avoid scam orders, it is recommended to leave this option disabled.</small>
                     </div>
 
                     <div class="form-group">
@@ -91,6 +108,12 @@
             $("#defaultLocation").select2()
             $('[data-toggle="tooltip"]').tooltip()
             $('.data-table').DataTable();
+            $("#priceprovider").select2({
+                ajax:{
+                    url: "{{ route("treelib.priceProviderLookup") }}",
+                    dataType: "json"
+                }
+            })
         });
     </script>
 @endpush

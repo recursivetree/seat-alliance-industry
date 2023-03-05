@@ -13,6 +13,8 @@ class AllianceIndustrySettings
     public static $ORDER_CREATION_PING_ROLES;
     public static $ALLOW_PRICES_BELOW_AUTOMATIC;
     public static $DEFAULT_ORDER_LOCATION;
+    public static $DEFAULT_PRICE_PROVIDER;
+    public static $ALLOW_PRICE_PROVIDER_SELECTION;
 
 
     //used in an earlier iteration of the notification system, still used in migrations
@@ -21,6 +23,8 @@ class AllianceIndustrySettings
     public static function init(){
         self::$LAST_NOTIFICATION_BATCH = Setting::create("allianceindustry","notifications.batch.last",true);
         self::$DEFAULT_ORDER_LOCATION = Setting::create("allianceindustry","order.location.default",true);
+        self::$DEFAULT_PRICE_PROVIDER = Setting::create("allianceindustry","order.price.provider.default",true);
+        self::$ALLOW_PRICE_PROVIDER_SELECTION = Setting::create("allianceindustry","order.price.provider.change.allowed",true);
 
         //with manual key because it is migrated from the old settings system
         self::$MINIMUM_PROFIT_PERCENTAGE = Setting::createFromKey("recursivetree.allianceindustry.minimumProfitPercentage",true);
