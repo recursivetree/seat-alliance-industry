@@ -16,6 +16,7 @@ class AllianceIndustrySettings
     public static $DEFAULT_PRICE_PROVIDER;
     public static $ALLOW_PRICE_PROVIDER_SELECTION;
     public static $MANUFACTURING_TIME_COST_MULTIPLIERS;
+    public static $REACTION_TIME_COST_MULTIPLIERS;
 
 
     //used in an earlier iteration of the notification system, still used in migrations
@@ -26,7 +27,8 @@ class AllianceIndustrySettings
         self::$DEFAULT_ORDER_LOCATION = Setting::create("allianceindustry","order.location.default",true);
         self::$DEFAULT_PRICE_PROVIDER = Setting::create("allianceindustry","order.price.provider.default",true);
         self::$ALLOW_PRICE_PROVIDER_SELECTION = Setting::create("allianceindustry","order.price.provider.change.allowed",true);
-        self::$MANUFACTURING_TIME_COST_MULTIPLIERS = Setting::create("allianceindustry","price.provider.time.cost.modifiers",true);
+        self::$MANUFACTURING_TIME_COST_MULTIPLIERS = Setting::create("allianceindustry","price.provider.modifiers.manufacturing",true);
+        self::$REACTION_TIME_COST_MULTIPLIERS = Setting::create("allianceindustry","price.provider.modifiers.reactions",true);
 
         //with manual key because it is migrated from the old settings system
         self::$MINIMUM_PROFIT_PERCENTAGE = Setting::createFromKey("recursivetree.allianceindustry.minimumProfitPercentage",true);

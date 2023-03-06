@@ -13,7 +13,10 @@ class BuildTimePriceProvider extends AbstractPriceProvider
 
     public static function getPrices($items, $settings)
     {
-        $config = AllianceIndustrySettings::$MANUFACTURING_TIME_COST_MULTIPLIERS->get([]);
+        $config = [
+            1=>AllianceIndustrySettings::$MANUFACTURING_TIME_COST_MULTIPLIERS->get(0),
+            11=>AllianceIndustrySettings::$REACTION_TIME_COST_MULTIPLIERS->get(0),
+        ];
 
         return $items->map(function ($item) use ($config){
             $job = DB::table("industryActivityProducts")

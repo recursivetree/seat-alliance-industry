@@ -344,10 +344,8 @@ class AllianceIndustryController extends Controller
         $allowPriceBelowAutomatic = AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->get(false);
         $allowPriceProviderSelection = AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->get(false);
 
-        $industryTimeCostModifiers = AllianceIndustrySettings::$MANUFACTURING_TIME_COST_MULTIPLIERS->get(null);
-        //see ramActivities for a mapping
-        $industryTimeCostManufacturingModifier = $industryTimeCostModifiers[1] ?? 0;
-        $industryTimeCostReactionsModifier = $industryTimeCostModifiers[11] ?? 0;
+        $industryTimeCostManufacturingModifier = floatval(AllianceIndustrySettings::$MANUFACTURING_TIME_COST_MULTIPLIERS->get(0));
+        $industryTimeCostReactionsModifier = floatval(AllianceIndustrySettings::$REACTION_TIME_COST_MULTIPLIERS->get(0));
 
         $price_providers = config('treelib.priceproviders');
         $default_price_provider = $price_providers[AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(EvePraisalPriceProvider::class)] ?? $price_providers[EvePraisalPriceProvider::class];
@@ -392,11 +390,9 @@ class AllianceIndustryController extends Controller
         AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->set(boolval($request->allowPriceBelowAutomatic));
         AllianceIndustrySettings::$DEFAULT_ORDER_LOCATION->set($request->defaultLocation);
         AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->set(boolval($request->allowPriceProviderSelection));
-        AllianceIndustrySettings::$MANUFACTURING_TIME_COST_MULTIPLIERS->set([
-            //see ramActivities for mappings
-            1 => $request->industryTimeCostManufacturingModifier,
-            11 => $request->industryTimeCostReactionsModifier,
-        ]);
+        AllianceIndustrySettings::$MANUFACTURING_TIME_COST_MULTIPLIERS->set($request->industryTimeCostManufacturingModifier);
+        AllianceIndustrySettings::$REACTION_TIME_COST_MULTIPLIERS->set($request->industryTimeCostReactionsModifier);
+
 
         $request->session()->flash("success", "Successfully saved settings");
         return redirect()->route("allianceindustry.settings");
