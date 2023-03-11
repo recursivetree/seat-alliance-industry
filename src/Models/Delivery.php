@@ -11,7 +11,7 @@ class Delivery extends Model
 {
     public $timestamps = false;
 
-    protected $table = 'recursive_tree_seat_alliance_industry_deliveries';
+    protected $table = 'seat_alliance_industry_deliveries';
 
     public function order(){
         return $this->hasOne(Order::class, 'id', 'order_id');

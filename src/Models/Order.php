@@ -13,7 +13,7 @@ class Order extends Model
 {
     public $timestamps = false;
 
-    protected $table = 'recursive_tree_seat_alliance_industry_orders';
+    protected $table = 'seat_alliance_industry_orders';
 
     public function deliveries(){
         return $this->hasMany(Delivery::class,"order_id","id");
