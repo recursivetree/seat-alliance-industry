@@ -23,7 +23,7 @@
     "eveseat/eveapi": "^4.18.2",
     "eveseat/services": "^4.0",
     "eveseat/notifications": "^4.0",
-    "recursivetree/seat-treelib": "dev-staging"
+    "recursivetree/seat-treelib": "^1.1.3"
   },
   "extra": {
     "laravel": {
