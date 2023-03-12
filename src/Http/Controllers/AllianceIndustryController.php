@@ -6,9 +6,11 @@ use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
+use RecursiveTree\Seat\AllianceIndustry\Models\OrderItem;
 use RecursiveTree\Seat\AllianceIndustry\Prices\AllianceIndustryPriceSettings;
 use RecursiveTree\Seat\TreeLib\Helpers\SeatInventoryPluginHelper;
 use RecursiveTree\Seat\TreeLib\Items\EveItem;
+use RecursiveTree\Seat\TreeLib\Items\ToEveItem;
 use RecursiveTree\Seat\TreeLib\Parser\Parser;
 use RecursiveTree\Seat\TreeLib\Prices\AbstractPriceProvider;
 use RecursiveTree\Seat\TreeLib\Prices\EvePraisalPriceProvider;
@@ -66,6 +68,7 @@ class AllianceIndustryController extends Controller
             "location" => "required|integer",
             "addProfitToManualPrices" => "nullable|in:on",
             "addToSeatInventory" => "nullable|in:on",
+            "splitOrders" => "nullable|in:on",
             "priority" => "required|integer",
             "priceprovider"=>"nullable|string"
         ]);
@@ -114,8 +117,6 @@ class AllianceIndustryController extends Controller
         }
 
         foreach ($appraised_items as $item) {
-            $order = new Order();
-
             if ($item->manualPrice !== null && $item->manualPrice < $item->marketPrice && $prohibitManualPricesBelowValue) {
                 $item->price = $item->marketPrice;
             }
@@ -123,11 +124,20 @@ class AllianceIndustryController extends Controller
             if ($item->manualPrice == null || $addProfitToManualPrice) {
                 $item->price *= $price_modifier;
             }
+        }
 
-            $order->type_id = $item->typeModel->typeID;
-            $order->quantity = $item->amount;
+        if($request->splitOrders===null) {
+            //group mode
+            $price = 0;
+            foreach ($appraised_items as $item){
+                $price += $item->amount*$item->price;
+            }
+
+            $order = new Order();
+            //TODO quantities
+            $order->quantity = 1;
             $order->user_id = auth()->user()->id;
-            $order->unit_price = $item->price;
+            $order->price = $price;
             $order->location_id = $request->location;
             $order->created_at = $now;
             $order->produce_until = $produce_until;
@@ -137,7 +147,38 @@ class AllianceIndustryController extends Controller
             $order->priceProvider = $priceProvider;
 
             $order->save();
+
+            foreach ($appraised_items as $item) {
+                $model = new OrderItem();
+                $model->order_id = $order->id;
+                $model->type_id = $item->typeModel->typeID;
+                $model->quantity = $item->amount;
+                $model->save();
+            }
+        } else {
+            //classical mode
+            foreach ($appraised_items as $item) {
+                $order = new Order();
+                $order->quantity = $item->amount;
+                $order->user_id = auth()->user()->id;
+                $order->price = $item->price;
+                $order->location_id = $request->location;
+                $order->created_at = $now;
+                $order->produce_until = $produce_until;
+                $order->add_seat_inventory = $addToSeatInventory;
+                $order->profit = floatval($request->profit);
+                $order->priority = $request->priority;
+                $order->priceProvider = $priceProvider;
+                $order->save();
+
+                $order_item = new OrderItem();
+                $order_item->order_id = $order->id;
+                $order_item->type_id = $item->typeModel->typeID;
+                $order_item->quantity = 1;
+                $order_item->save();
+            }
         }
+
 
         //send notification that orders have been put up. We don't do it in an observer so it only gets triggered once
         SendOrderNotifications::dispatch()->onQueue('notifications');
@@ -146,7 +187,7 @@ class AllianceIndustryController extends Controller
         return redirect()->route("allianceindustry.orders");
     }
 
-    public function extendOrderPrice(Request $request)
+    public function extendOrderTime(Request $request)
     {
         $request->validate([
             "order" => "required|integer"
@@ -179,16 +220,19 @@ class AllianceIndustryController extends Controller
 
         Gate::authorize("allianceindustry.same-user", $order->user_id);
 
+        $profit_multiplier = 1 + ($order->profit / 100.0);
+        $item_list = $order->items->map(function ($item){return $item->toEveItem();});
+
         //null is only after update, so don't use the setting
         $priceProvider = $order->priceProvider ?? EvePraisalPriceProvider::class;
+        $appraised_items = $priceProvider::getPrices($item_list, new AllianceIndustryPriceSettings());
+        $price = 0;
+        foreach ($appraised_items as $item){
+            $price += $item->amount * $item->price;
+        }
+        $price *= $profit_multiplier;
 
-        $profit_multiplier = 1 + ($order->profit / 100.0);
-
-        $item_list = collect([new EveItem($order->type)]);
-        $item = $priceProvider::getPrices($item_list, new AllianceIndustryPriceSettings())->first();
-        $price = $item->price * $profit_multiplier;
-
-        $order->unit_price = $price;
+        $order->price = $price;
         $order->save();
 
         $request->session()->flash("success", "Updated the price!");

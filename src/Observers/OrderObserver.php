@@ -8,5 +8,8 @@ class OrderObserver
         foreach ($order->deliveries as $delivery){
             $delivery->delete();
         }
+        foreach ($order->items as $item){
+            $item->delete();
+        }
     }
 }

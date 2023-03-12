@@ -19,8 +19,8 @@ class Order extends Model
         return $this->hasMany(Delivery::class,"order_id","id");
     }
 
-    public function type(){
-        return $this->hasOne(InvType::class, 'typeID', 'type_id');
+    public function items(){
+        return $this->hasMany(OrderItem::class,"order_id","id");
     }
 
     public function user(){

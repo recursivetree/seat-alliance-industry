@@ -22,7 +22,9 @@ class DeliveryObserver
             if(SeatInventoryPluginHelper::pluginIsAvailable()) {
                 $order = $delivery->order;
                 $source = $delivery->seatInventorySource;
+                //check if we have to add a source
                 if ($order->add_seat_inventory && $source === null) {
+                    //TODO fix inventory integration
                     $workspace = SeatInventoryPluginHelper::$WORKSPACE_MODEL::where("name", "like", "%add2allianceindustry%")->first();
 
                     if (!$workspace) return;
@@ -30,16 +32,18 @@ class DeliveryObserver
                     $user_name = $delivery->user->name;
                     $source = new SeatInventoryPluginHelper::$INVENTORY_SOURCE_MODEL();
                     $source->location_id = SeatInventoryPluginHelper::$LOCATION_MODEL::where("structure_id", $order->location_id)->orWhere("station_id", $order->location_id)->first()->id;
-                    $source->source_name = "AllianceIndustry Delivery from $user_name";
+                    $source->source_name = "alliance-industry delivery (#$order->id) from $user_name";
                     $source->source_type = "alliance_industry_delivery";
                     $source->workspace_id = $workspace->id;
                     $source->save();
 
-                    $item = new SeatInventoryPluginHelper::$INVENTORY_ITEM_MODEL();
-                    $item->source_id = $source->id;
-                    $item->type_id = $order->type_id;
-                    $item->amount = $delivery->quantity;
-                    $item->save();
+                    foreach ($order->items as $order_item) {
+                        $item = new SeatInventoryPluginHelper::$INVENTORY_ITEM_MODEL();
+                        $item->source_id = $source->id;
+                        $item->type_id = $order_item->type_id;
+                        $item->amount = $order_item->quantity * $order->quantity;
+                        $item->save();
+                    }
 
                     $delivery->seat_inventory_source = $source->id;
                 }

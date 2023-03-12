@@ -79,7 +79,7 @@ Route::group([
 
     Route::post('/orders/extend', [
         'as'   => 'allianceindustry.extendOrderPrice',
-        'uses' => 'AllianceIndustryController@extendOrderPrice',
+        'uses' => 'AllianceIndustryController@extendOrderTime',
         'middleware' => 'can:allianceindustry.create_orders'
     ]);
 

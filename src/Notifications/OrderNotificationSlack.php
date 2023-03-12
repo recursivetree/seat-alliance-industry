@@ -3,6 +3,7 @@
 namespace RecursiveTree\Seat\AllianceIndustry\Notifications;
 
 use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
+use RecursiveTree\Seat\AllianceIndustry\Models\OrderItem;
 use RecursiveTree\Seat\TreeLib\Helpers\PrioritySystem;
 use Seat\Notifications\Notifications\AbstractNotification;
 use Illuminate\Notifications\Messages\SlackMessage;
@@ -43,17 +44,16 @@ class OrderNotificationSlack extends AbstractNotification implements ShouldQueue
                 $attachment
                     ->title("New SeAT Alliance Industry Orders:",  route("allianceindustry.orders"));
                 foreach ($orders as $order){
-                    $itemName = $order->type->typeName;
+                    $item_text = OrderItem::formatOrderItemsList($order);
                     $location = $order->location()->name;
-                    $quantity = number($order->quantity,0);
-                    $price = number_metric($order->unit_price);
-                    $totalPrice = number_metric($order->unit_price * $order->quantity);
+                    $price = number_metric($order->price);
+                    $totalPrice = number_metric($order->price * $order->quantity);
                     $priority = PrioritySystem::getPriorityData()[$order->priority]["name"] ?? trans("seat.web.unknown");
 
-                    $attachment->field(function ($field) use ($priority, $totalPrice, $price, $quantity, $location, $itemName) {
+                    $attachment->field(function ($field) use ($item_text, $priority, $totalPrice, $price, $location) {
                         $field
                             ->long()
-                            ->title("$quantity $itemName(s)")
+                            ->title($item_text)
                             ->content("Priority: $priority | $price ISK/unit |  $totalPrice ISK total  | $location");
                     });
                 }

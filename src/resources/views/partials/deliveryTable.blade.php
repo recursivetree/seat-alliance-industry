@@ -23,8 +23,8 @@
     @foreach($deliveries as $delivery)
         <tr>
             @if($showOrder ?? false)
-                <td data-order="{{ $delivery->order->type->typeID }}" data-filter="{{ $delivery->order->type->typeName }}">
-                    <a href="{{ route("allianceindustry.orderDetails",$delivery->order_id) }}">{{ $delivery->order->type->typeName }}</a>
+                <td>
+                    <a href="{{ route("allianceindustry.orderDetails",$delivery->order_id) }}">{{ \RecursiveTree\Seat\AllianceIndustry\Models\OrderItem::formatOrderItemsList($delivery->order) }}</a>
                 </td>
             @endif
             <td data-order="{{ $delivery->quantity }}" data-filter="_">
@@ -37,12 +37,12 @@
                 @endif
             </td>
             @if($showOrder ?? false)
-                <td data-order="{{ $delivery->order->unit_price }}" data-filter="_">
-                    {{ number($delivery->order->unit_price) }} ISK
+                <td data-order="{{ $delivery->order->price }}" data-filter="_">
+                    {{ number($delivery->order->price) }} ISK
                 </td>
             @endif
-            <td data-order="{{ $delivery->order->unit_price * $delivery->quantity }}" data-filter="_">
-                {{ number($delivery->order->unit_price * $delivery->quantity) }} ISK
+            <td data-order="{{ $delivery->order->price * $delivery->quantity }}" data-filter="_">
+                {{ number($delivery->order->price * $delivery->quantity) }} ISK
             </td>
             <td data-order="{{ $delivery->accepted }}" data-filter="_">
                 @include("allianceindustry::partials.time",["date"=>$delivery->accepted])

@@ -24,6 +24,11 @@
                             class="form-control"
                             placeholder="{{"MULTIBUY:\nTristan 100\nOmen 100\nTritanium 30000\n\nFITTINGS:\n[Pacifier, 2022 Scanner]\n\nCo-Processor II\nCo-Processor II\n\nMultispectrum Shield Hardener II\nMultispectrum Shield Hardener II\n\nSmall Tractor Beam II\nSmall Tractor Beam II"}}"
                             rows="20">{{ $multibuy ?? "" }}</textarea>
+
+                    <div class="form-check">
+                        <input type="checkbox" id="splitOrders" class="form-check-input" name="splitOrders" checked>
+                        <label for="splitOrders" class="form-check-label">Split items into separate orders</label>
+                    </div>
                 </div>
 
                 @if($allowPriceProviderSelection)

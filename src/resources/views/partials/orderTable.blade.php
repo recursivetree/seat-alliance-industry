@@ -5,7 +5,7 @@
         <th>Order</th>
         <th>Quantity</th>
         <th>Completed</th>
-        <th>Unit Price</th>
+        <th>Price</th>
         <th>Total Price</th>
         <th>Location</th>
         <th>Created</th>
@@ -19,8 +19,8 @@
             <td data-sort="{{ $order->priority }}" data-filter="_">
                 @include("treelib::partials.priority",["priority"=>$order->priority])
             </td>
-            <td data-sort="{{ $order->type->typeID }}" data-filter="{{ $order->type->typeName }}">
-                <a href="{{ route("allianceindustry.orderDetails",$order->id) }}">{{ $order->type->typeName }}</a>
+            <td>
+                <a href="{{ route("allianceindustry.orderDetails",$order->id) }}">{{ \RecursiveTree\Seat\AllianceIndustry\Models\OrderItem::formatOrderItemsList($order) }}</a>
             </td>
             <td data-sort="{{ $order->quantity - $order->assignedQuantity() }}" data-filter="_">
                 {{number($order->assignedQuantity(),0)}}/{{ number($order->quantity,0) }}
@@ -31,11 +31,11 @@
                     @include("allianceindustry::partials.time",["date"=>$order->completed_at])
                 @endif
             </td>
-            <td data-sort="{{$order->unit_price}}" data-filter="_">
-                {{ number($order->unit_price) }} ISK
+            <td data-sort="{{$order->price}}" data-filter="_">
+                {{ number($order->price) }} ISK
             </td>
-            <td data-sort="{{ $order->unit_price * $order->quantity }}" data-filter="_">
-                {{ number($order->unit_price * $order->quantity) }} ISK
+            <td data-sort="{{ $order->price * $order->quantity }}" data-filter="_">
+                {{ number($order->price * $order->quantity) }} ISK
             </td>
             <td data-sort="{{ $order->location_id }}" data-filter="{{ $order->location()->name }}">
                 @include("allianceindustry::partials.longTextTooltip",["text"=>$order->location()->name,"length"=>25])
