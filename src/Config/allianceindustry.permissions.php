@@ -13,6 +13,10 @@ return [
         'label' => 'Create Orders',
         'description' => 'Allows you to order products',
     ],
+    'create_repeating_orders' => [
+        'label' => 'Create repeating Orders',
+        'description' => 'Allows you to create orders that appear every x days',
+    ],
     'admin' => [
         'label' => 'Plugin Admin',
         'description' => 'Allows you to edit other\'s orders',

@@ -1,7 +1,7 @@
 <table class="data-table table table-striped table-hover">
     <thead>
     <tr>
-        <th>Priority</th>
+        <th>Tags</th>
         <th>Order</th>
         <th>Quantity</th>
         <th>Completed</th>
@@ -18,6 +18,9 @@
         <tr>
             <td data-sort="{{ $order->priority }}" data-filter="_">
                 @include("treelib::partials.priority",["priority"=>$order->priority])
+                @if($order->is_repeating)
+                    <span class="badge badge-secondary">Repeating</span>
+                @endif
             </td>
             <td>
                 <a href="{{ route("allianceindustry.orderDetails",$order->id) }}">{{ \RecursiveTree\Seat\AllianceIndustry\Models\OrderItem::formatOrderItemsList($order) }}</a>

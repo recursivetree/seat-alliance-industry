@@ -4,6 +4,7 @@ namespace RecursiveTree\Seat\AllianceIndustry\Http\Controllers;
 
 use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
+use RecursiveTree\Seat\AllianceIndustry\Jobs\UpdateRepeatingOrders;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use RecursiveTree\Seat\AllianceIndustry\Models\OrderItem;
@@ -32,6 +33,7 @@ class AllianceIndustryController extends Controller
         $orders = Order::with("deliveries")
             ->where("completed", false)
             ->where("produce_until",">",DB::raw("NOW()"))
+            ->where("is_repeating",false)
             ->get()
             ->filter(function ($order) {
                 return $order->assignedQuantity() < $order->quantity;
@@ -70,7 +72,8 @@ class AllianceIndustryController extends Controller
             "addToSeatInventory" => "nullable|in:on",
             "splitOrders" => "nullable|in:on",
             "priority" => "required|integer",
-            "priceprovider"=>"nullable|string"
+            "priceprovider"=>"nullable|string",
+            "repetition"=>"nullable|integer"
         ]);
 
         if($request->priceprovider !== null && (!class_exists($request->priceprovider) || !is_subclass_of($request->priceprovider,AbstractPriceProvider::class))){
@@ -146,6 +149,14 @@ class AllianceIndustryController extends Controller
             $order->priority = $request->priority;
             $order->priceProvider = $priceProvider;
 
+            $repetition = intval($request->repetition);
+            if($repetition > 0){
+                Gate::authorize("allianceindustry.create_repeating_orders");
+                $order->is_repeating = true;
+                $order->repeat_interval = $repetition;
+                $order->repeat_date = now();
+            }
+
             $order->save();
 
             foreach ($appraised_items as $item) {
@@ -169,6 +180,16 @@ class AllianceIndustryController extends Controller
                 $order->profit = floatval($request->profit);
                 $order->priority = $request->priority;
                 $order->priceProvider = $priceProvider;
+
+                //this is duplicated
+                $repetition = intval($request->repetition);
+                if($repetition > 0){
+                    Gate::authorize("allianceindustry.create_repeating_orders");
+                    $order->is_repeating = true;
+                    $order->repeat_interval = $repetition;
+                    $order->repeat_date = now();
+                }
+
                 $order->save();
 
                 $order_item = new OrderItem();
@@ -182,6 +203,9 @@ class AllianceIndustryController extends Controller
 
         //send notification that orders have been put up. We don't do it in an observer so it only gets triggered once
         SendOrderNotifications::dispatch()->onQueue('notifications');
+
+        // update repeating orders
+        UpdateRepeatingOrders::dispatch();
 
         $request->session()->flash("success", "Successfully added new order");
         return redirect()->route("allianceindustry.orders");
@@ -260,6 +284,11 @@ class AllianceIndustryController extends Controller
         $order = Order::find($orderId);
         if (!$order) {
             $request->session()->flash("error", "Could not find order");
+            return redirect()->route("allianceindustry.orders");
+        }
+
+        if($order->is_repeating){
+            $request->session()->flash("error", "Repeating orders can't have deliveries");
             return redirect()->route("allianceindustry.orders");
         }
 
@@ -444,7 +473,7 @@ class AllianceIndustryController extends Controller
 
     public function deleteCompletedOrders()
     {
-        $orders = Order::where("user_id", auth()->user()->id)->where("completed", true)->get();
+        $orders = Order::where("user_id", auth()->user()->id)->where("completed", true)->where("is_repeating",false)->get();
         foreach ($orders as $order) {
             $order->delete();
         }

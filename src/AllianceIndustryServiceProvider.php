@@ -3,6 +3,7 @@
 namespace RecursiveTree\Seat\AllianceIndustry;
 
 use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
+use RecursiveTree\Seat\AllianceIndustry\Jobs\UpdateRepeatingOrders;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Observers\DeliveryObserver;
@@ -53,6 +54,14 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
 
         $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.sde.tables.php','seat.sde.tables');
         $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.priceproviders.php','treelib.priceproviders');
+
+        Artisan::command('allianceindustry:orders:repeating {--sync}', function () {
+            if($this->option("sync")){
+                UpdateRepeatingOrders::dispatchNow();
+            } else {
+                UpdateRepeatingOrders::dispatch();
+            }
+        });
     }
 
     public function register(){

@@ -104,6 +104,18 @@
                     </div>
                 @endif
 
+                @can("allianceindustry.create_repeating_orders")
+                    <div class="form-group">
+                        <label for="repetition">Repetition</label>
+                        <select id="repetition" name="repetition" class="form-control">
+                            <option value="0" selected>Never</option>
+                            <option value="7">Weekly</option>
+                            <option value="14">Every 2 weeks</option>
+                            <option value="28">Monthly</option>
+                        </select>
+                    </div>
+                @endcan
+
                 <button type="submit" class="btn btn-primary">Add Order</button>
             </form>
 
