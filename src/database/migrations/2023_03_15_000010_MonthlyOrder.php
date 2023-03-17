@@ -13,8 +13,6 @@ class MonthlyOrder extends Migration
             $table->dateTime("repeat_date")->nullable();
             $table->smallInteger("repeat_interval")->unsignned()->nullable();
         });
-
-        \RecursiveTree\Seat\TreeLib\Helpers\ScheduleHelper::scheduleCommand("allianceindustry:orders:repeating","1 34 * * *");
     }
 
     public function down()
@@ -24,6 +22,8 @@ class MonthlyOrder extends Migration
             $table->dropColumn("repeat_date");
             $table->dropColumn("repeat_interval");
         });
+
+        \RecursiveTree\Seat\TreeLib\Helpers\ScheduleHelper::removeCommand("allianceindustry:orders:repeating");
     }
 }
 
