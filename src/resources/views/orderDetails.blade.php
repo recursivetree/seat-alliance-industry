@@ -51,6 +51,29 @@
         </div>
     </div>
 
+    @if($order->items->count() > 1)
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-header px-1">
+                    Items
+                </h5>
+                <div class="card-text pt-3">
+                    <ul class="list-group">
+                        @foreach($order->items as $item)
+                            <li class="list-group-item">
+                                @include("web::partials.type",[
+                                    'type_id'   => $item->type_id,
+                                    'type_name' => $item->quantity."x ".$item->type->typeName,
+                                    'variation' => $item->type->group->categoryID == 9 ? 'bpc' : 'icon',
+                                ])
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if($order->is_repeating)
         <div class="card">
             <div class="card-body">
@@ -58,7 +81,8 @@
                     Repeating Order
                 </h5>
                 <div class="card-text pt-3">
-                    This is a order repeating itself every {{ number($order->repeat_interval,0) }} days. The next repetition will be published on the {{ $order->repeat_date }}.
+                    This is a order repeating itself every {{ number($order->repeat_interval,0) }} days. The next
+                    repetition will be published on the {{ $order->repeat_date }}.
                 </div>
             </div>
         </div>
