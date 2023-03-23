@@ -48,6 +48,14 @@
                     <h5>General Settings</h5>
 
                     <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" id="removeExpiredDeliveries" class="form-check-input" name="removeExpiredDeliveries" @checked($removeExpiredDeliveries)>
+                            <label for="removeExpiredDeliveries" class="form-check-label">Remove expired deliveries</label>
+                        </div>
+                        <small class="text-muted">If a delivery isn't fulfilled when the order expires, the delivery will be deleted.</small>
+                    </div>
+
+                    <div class="form-group">
                         <label for="defaultLocation">Default Location</label>
                         <select id="defaultLocation" class="form-control" name="defaultLocation">
                             @foreach($stations as $station)

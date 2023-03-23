@@ -423,7 +423,9 @@ class AllianceIndustryController extends Controller
         $price_providers = config('treelib.priceproviders');
         $default_price_provider = $price_providers[AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(EvePraisalPriceProvider::class)] ?? $price_providers[EvePraisalPriceProvider::class];
 
-        return view("allianceindustry::settings", compact("industryTimeCostManufacturingModifier","industryTimeCostReactionsModifier","allowPriceProviderSelection","default_price_provider","marketHub", "mpp", "priceType", "orderCreationPingRoles", "allowPriceBelowAutomatic", "stations", "structures", "defaultOrderLocation"));
+        $removeExpiredDeliveries = AllianceIndustrySettings::$REMOVE_EXPIRED_DELIVERIES->get(false);
+
+        return view("allianceindustry::settings", compact("industryTimeCostManufacturingModifier","removeExpiredDeliveries","industryTimeCostReactionsModifier","allowPriceProviderSelection","default_price_provider","marketHub", "mpp", "priceType", "orderCreationPingRoles", "allowPriceBelowAutomatic", "stations", "structures", "defaultOrderLocation"));
     }
 
     public function saveSettings(Request $request)
@@ -437,6 +439,7 @@ class AllianceIndustryController extends Controller
             "defaultLocation" => "required|integer",
             "defaultPriceProvider" => "required|string",
             "allowPriceProviderSelection"=>"nullable|in:on",
+            "removeExpiredDeliveries"=>"nullable|in:on",
             "industryTimeCostManufacturingModifier"=>"required|integer|min:0",
             "industryTimeCostReactionsModifier"=>"required|integer|min:0",
         ]);
@@ -465,7 +468,7 @@ class AllianceIndustryController extends Controller
         AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->set(boolval($request->allowPriceProviderSelection));
         AllianceIndustrySettings::$MANUFACTURING_TIME_COST_MULTIPLIERS->set($request->industryTimeCostManufacturingModifier);
         AllianceIndustrySettings::$REACTION_TIME_COST_MULTIPLIERS->set($request->industryTimeCostReactionsModifier);
-
+        AllianceIndustrySettings::$REMOVE_EXPIRED_DELIVERIES->set(boolval($request->removeExpiredDeliveries));
 
         $request->session()->flash("success", "Successfully saved settings");
         return redirect()->route("allianceindustry.settings");

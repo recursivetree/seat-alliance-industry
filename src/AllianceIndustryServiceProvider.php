@@ -2,6 +2,7 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry;
 
+use RecursiveTree\Seat\AllianceIndustry\Jobs\RemoveExpiredDeliveries;
 use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
 use RecursiveTree\Seat\AllianceIndustry\Jobs\UpdateRepeatingOrders;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
@@ -60,6 +61,14 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
                 UpdateRepeatingOrders::dispatchNow();
             } else {
                 UpdateRepeatingOrders::dispatch();
+            }
+        });
+
+        Artisan::command('allianceindustry:deliveries:expired {--sync}', function () {
+            if($this->option("sync")){
+                RemoveExpiredDeliveries::dispatchNow();
+            } else {
+                RemoveExpiredDeliveries::dispatch();
             }
         });
     }
