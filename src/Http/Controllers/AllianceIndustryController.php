@@ -172,7 +172,7 @@ class AllianceIndustryController extends Controller
                 $order = new Order();
                 $order->quantity = $item->amount;
                 $order->user_id = auth()->user()->id;
-                $order->price = $item->price;
+                $order->price = $item->price * 1; // * 1 stands for the multiplication with the quantity used in the update prices section
                 $order->location_id = $request->location;
                 $order->created_at = $now;
                 $order->produce_until = $produce_until;

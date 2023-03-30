@@ -50,7 +50,7 @@ class OrderItem extends Model implements ToEveItem
         } else if($items->count()==1) {
             $item = $items->first();
             $name = $item->type->typeName;
-            return "$order->quantity $name";
+            return "$item->quantity $name";
         } else {
             return "invalid order";
         }
