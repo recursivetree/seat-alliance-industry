@@ -46,18 +46,21 @@ class AllianceIndustryController extends Controller
 
     public function createOrder()
     {
+        //ALSO UPDATE API
+
         $stations = UniverseStation::all();
         $structures = UniverseStructure::all();
 
         $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
-
+        //ALSO UPDATE API
         $location_id = AllianceIndustrySettings::$DEFAULT_ORDER_LOCATION->get(60003760);//jita
-
+        //ALSO UPDATE API
         $price_providers = config('treelib.priceproviders');
         $default_price_provider = $price_providers[AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(EvePraisalPriceProvider::class)] ?? $price_providers[EvePraisalPriceProvider::class];
-
+        //ALSO UPDATE API
         $allowPriceProviderSelection = AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->get(false);
 
+        //ALSO UPDATE API
         return view("allianceindustry::createOrder", compact("allowPriceProviderSelection","stations", "structures", "mpp", "location_id", "default_price_provider"));
     }
 
