@@ -37,7 +37,7 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
         Artisan::command('allianceindustry:notifications {--sync}', function () {
             if ($this->option("sync")){
                 $this->info("processing...");
-                SendOrderNotifications::dispatchNow();
+                SendOrderNotifications::dispatchSync();
                 $this->info("Synchronously sent notification!");
             } else {
                 SendOrderNotifications::dispatch()->onQueue('notifications');
@@ -58,7 +58,7 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
 
         Artisan::command('allianceindustry:orders:repeating {--sync}', function () {
             if($this->option("sync")){
-                UpdateRepeatingOrders::dispatchNow();
+                UpdateRepeatingOrders::dispatchSync();
             } else {
                 UpdateRepeatingOrders::dispatch();
             }
@@ -66,7 +66,7 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
 
         Artisan::command('allianceindustry:deliveries:expired {--sync}', function () {
             if($this->option("sync")){
-                RemoveExpiredDeliveries::dispatchNow();
+                RemoveExpiredDeliveries::dispatchSync();
             } else {
                 RemoveExpiredDeliveries::dispatch();
             }
