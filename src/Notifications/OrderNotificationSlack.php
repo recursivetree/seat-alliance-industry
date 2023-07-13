@@ -5,12 +5,12 @@ namespace RecursiveTree\Seat\AllianceIndustry\Notifications;
 use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use RecursiveTree\Seat\AllianceIndustry\Models\OrderItem;
 use RecursiveTree\Seat\TreeLib\Helpers\PrioritySystem;
-use Seat\Notifications\Notifications\AbstractNotification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Seat\Notifications\Notifications\AbstractSlackNotification;
 
-class OrderNotificationSlack extends AbstractNotification implements ShouldQueue
+class OrderNotificationSlack extends AbstractSlackNotification implements ShouldQueue
 {
     use SerializesModels;
 
@@ -20,19 +20,15 @@ class OrderNotificationSlack extends AbstractNotification implements ShouldQueue
         $this->orders = $orders;
     }
 
-    public function via($notifiable)
+    public function populateMessage(SlackMessage $message, $notifiable)
     {
-        return ['slack'];
-    }
-
-    public function toSlack(){
         $orders = $this->orders;
 
         $pings = implode(" ", array_map(function ($role){
             return "<@&$role>";
         }, AllianceIndustrySettings::$ORDER_CREATION_PING_ROLES->get([])));
 
-        $message = (new SlackMessage)
+        $message
             ->success()
             ->from("SeAT Alliance Industry");
 

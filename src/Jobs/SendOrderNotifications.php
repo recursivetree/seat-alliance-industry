@@ -11,13 +11,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
-use Illuminate\Support\Facades\Notification;
 use Seat\Notifications\Models\NotificationGroup;
+use Seat\Notifications\Traits\NotificationDispatchTool;
 
 
 class SendOrderNotifications implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, NotificationDispatchTool;
 
 
     public function tags()
@@ -37,60 +37,21 @@ class SendOrderNotifications implements ShouldQueue
         }
 
         if(!$orders->isEmpty()) {
-            self::dispatchNotification($orders);
+            $this->dispatchNotification($orders);
         }
 
         AllianceIndustrySettings::$LAST_NOTIFICATION_BATCH->set($now);
     }
 
     //stolen from https://github.com/eveseat/notifications/blob/master/src/Observers/UserObserver.php
-    private static function dispatchNotification($orders){
-        $handlers = config('notifications.alerts.seat_alliance_industry_new_order_notification', [])["handlers"];
-
-        $routes = self::getRoutingCandidates();
-
-        // in case no routing candidates has been delivered, exit
-        if ($routes->isEmpty())
-            return;
-
-        // attempt to enqueue a notification for each routing candidates
-        $routes->each(function ($integration) use ($handlers, $orders) {
-            if (array_key_exists($integration->channel, $handlers)) {
-
-                // extract handler from the list
-                $handler = $handlers[$integration->channel];
-
-                // enqueue the notification
-                Notification::route($integration->channel, $integration->route)->notify(new $handler($orders));
-            }
-        });
-    }
-
-    //stolen from https://github.com/eveseat/notifications/blob/master/src/Observers/UserObserver.php
-    private static function getRoutingCandidates(){
-        $settings = NotificationGroup::with('alerts')
+    private function dispatchNotification($orders){
+        $groups = NotificationGroup::with('alerts')
             ->whereHas('alerts', function ($query) {
                 $query->where('alert', 'seat_alliance_industry_new_order_notification');
             })->get();
 
-        $routes = $settings->map(function ($group) {
-            return $group->integrations->map(function ($channel) {
-
-                // extract the route value from settings field
-                $settings = (array) $channel->settings;
-                $key = array_key_first($settings);
-                $route = $settings[$key];
-
-                // build a composite object built with channel and route
-                return (object) [
-                    'channel' => $channel->type,
-                    'route' => $route,
-                ];
-            });
-        });
-
-        return $routes->flatten()->unique(function ($integration) {
-            return $integration->channel . $integration->route;
+        $this->dispatchNotifications("seat_alliance_industry_new_order_notification",$groups,function ($constructor) use ($orders) {
+            return new $constructor($orders);
         });
     }
 }

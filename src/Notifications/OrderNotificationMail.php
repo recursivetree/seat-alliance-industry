@@ -2,12 +2,12 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry\Notifications;
 
-use Seat\Notifications\Notifications\AbstractNotification;
+use Seat\Notifications\Notifications\AbstractMailNotification;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class OrderNotificationMail extends AbstractNotification implements ShouldQueue
+class OrderNotificationMail extends AbstractMailNotification implements ShouldQueue
 {
     use SerializesModels;
 
@@ -17,17 +17,10 @@ class OrderNotificationMail extends AbstractNotification implements ShouldQueue
         $this->orders = $orders;
     }
 
-    public function via($notifiable)
+    public function populateMessage(MailMessage $message, $notifiable)
     {
-        return ['mail'];
-    }
 
-    public function toMail()
-    {
-        $orders = $this->orders;
-
-        $message = (new MailMessage)
-            ->success()
+        $message->success()
             ->subject("New Industry Orders")
             ->greeting("Hello Industrialist")
             ->line("New industry orders have been put up.")
