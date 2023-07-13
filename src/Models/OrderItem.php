@@ -25,7 +25,7 @@ class OrderItem extends Model implements ToEveItem
         return $this->hasOne(Order::class, 'id', 'order_id');
     }
 
-    public function toEveItem()
+    public function toEveItem(): EveItem
     {
         $item = new EveItem($this->type);
         $item->amount = $this->quantity;
