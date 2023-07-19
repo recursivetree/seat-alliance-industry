@@ -10,11 +10,9 @@ use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use RecursiveTree\Seat\AllianceIndustry\Models\OrderItem;
 use RecursiveTree\Seat\AllianceIndustry\Prices\AllianceIndustryPriceSettings;
 use RecursiveTree\Seat\TreeLib\Helpers\SeatInventoryPluginHelper;
-use RecursiveTree\Seat\TreeLib\Items\EveItem;
-use RecursiveTree\Seat\TreeLib\Items\ToEveItem;
 use RecursiveTree\Seat\TreeLib\Parser\Parser;
 use RecursiveTree\Seat\TreeLib\Prices\AbstractPriceProvider;
-use RecursiveTree\Seat\TreeLib\Prices\EvePraisalPriceProvider;
+use RecursiveTree\Seat\TreeLib\Prices\PriceProvider;
 use Seat\Eveapi\Models\Universe\UniverseStation;
 use Seat\Eveapi\Models\Universe\UniverseStructure;
 use Seat\Web\Http\Controllers\Controller;
@@ -56,7 +54,7 @@ class AllianceIndustryController extends Controller
         $location_id = AllianceIndustrySettings::$DEFAULT_ORDER_LOCATION->get(60003760);//jita
         //ALSO UPDATE API
         $price_providers = config('treelib.priceproviders');
-        $default_price_provider = $price_providers[AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(EvePraisalPriceProvider::class)] ?? $price_providers[EvePraisalPriceProvider::class];
+        $default_price_provider = $price_providers[AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(PriceProvider::DEFAULT_PRICE_PROVIDER)] ?? $price_providers[PriceProvider::DEFAULT_PRICE_PROVIDER];
         //ALSO UPDATE API
         $allowPriceProviderSelection = AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->get(false);
 
@@ -87,7 +85,7 @@ class AllianceIndustryController extends Controller
         if (AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->get(false)){
             $priceProvider = $request->priceprovider;
         } else {
-            $priceProvider = AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(EvePraisalPriceProvider::class);
+            $priceProvider = AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(PriceProvider::DEFAULT_PRICE_PROVIDER);
         }
 
         $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
@@ -251,7 +249,7 @@ class AllianceIndustryController extends Controller
         $item_list = $order->items->map(function ($item){return $item->toEveItem();});
 
         //null is only after update, so don't use the setting
-        $priceProvider = $order->priceProvider ?? EvePraisalPriceProvider::class;
+        $priceProvider = $order->priceProvider ?? PriceProvider::DEFAULT_PRICE_PROVIDER;
         $appraised_items = $priceProvider::getPrices($item_list, new AllianceIndustryPriceSettings());
         $price = 0;
         foreach ($appraised_items as $item){
@@ -424,7 +422,7 @@ class AllianceIndustryController extends Controller
         $industryTimeCostReactionsModifier = floatval(AllianceIndustrySettings::$REACTION_TIME_COST_MULTIPLIERS->get(0));
 
         $price_providers = config('treelib.priceproviders');
-        $default_price_provider = $price_providers[AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(EvePraisalPriceProvider::class)] ?? $price_providers[EvePraisalPriceProvider::class];
+        $default_price_provider = $price_providers[AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(PriceProvider::DEFAULT_PRICE_PROVIDER)] ?? $price_providers[PriceProvider::DEFAULT_PRICE_PROVIDER];
 
         $removeExpiredDeliveries = AllianceIndustrySettings::$REMOVE_EXPIRED_DELIVERIES->get(false);
 
