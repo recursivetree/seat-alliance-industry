@@ -23,7 +23,8 @@
     "eveseat/eveapi": "5.0.x-dev",
     "eveseat/services": "5.0.x-dev",
     "eveseat/notifications": "5.0.x-dev",
-    "recursivetree/seat-treelib": "5.0.x-dev"
+    "recursivetree/seat-treelib": "5.0.x-dev",
+    "recursivetree/seat-prices-core": "dev-master"
   },
   "extra": {
     "laravel": {

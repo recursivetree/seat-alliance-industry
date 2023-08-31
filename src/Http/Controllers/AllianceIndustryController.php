@@ -3,12 +3,14 @@
 namespace RecursiveTree\Seat\AllianceIndustry\Http\Controllers;
 
 use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
+use RecursiveTree\Seat\AllianceIndustry\Item\PriceableEveItem;
 use RecursiveTree\Seat\AllianceIndustry\Jobs\SendOrderNotifications;
 use RecursiveTree\Seat\AllianceIndustry\Jobs\UpdateRepeatingOrders;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use RecursiveTree\Seat\AllianceIndustry\Models\OrderItem;
 use RecursiveTree\Seat\AllianceIndustry\Prices\AllianceIndustryPriceSettings;
+use RecursiveTree\Seat\PricesCore\Facades\PriceProviderSystem;
 use RecursiveTree\Seat\TreeLib\Helpers\SeatInventoryPluginHelper;
 use RecursiveTree\Seat\TreeLib\Items\EveItem;
 use RecursiveTree\Seat\TreeLib\Items\ToEveItem;
@@ -47,16 +49,16 @@ class AllianceIndustryController extends Controller
     public function createOrder()
     {
         //ALSO UPDATE API
-
         $stations = UniverseStation::all();
+        //ALSO UPDATE API
         $structures = UniverseStructure::all();
 
+        //ALSO UPDATE API
         $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
         //ALSO UPDATE API
         $location_id = AllianceIndustrySettings::$DEFAULT_ORDER_LOCATION->get(60003760);//jita
         //ALSO UPDATE API
-        $price_providers = config('treelib.priceproviders');
-        $default_price_provider = $price_providers[AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(EvePraisalPriceProvider::class)] ?? $price_providers[EvePraisalPriceProvider::class];
+        $default_price_provider = AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get();
         //ALSO UPDATE API
         $allowPriceProviderSelection = AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->get(false);
 
@@ -75,19 +77,14 @@ class AllianceIndustryController extends Controller
             "addToSeatInventory" => "nullable|in:on",
             "splitOrders" => "nullable|in:on",
             "priority" => "required|integer",
-            "priceprovider"=>"nullable|string",
+            "priceprovider"=>"nullable|integer",
             "repetition"=>"nullable|integer"
         ]);
-
-        if($request->priceprovider !== null && (!class_exists($request->priceprovider) || !is_subclass_of($request->priceprovider,AbstractPriceProvider::class))){
-            $request->session()->flash("error","Invalid price provider");
-            return redirect()->back();
-        }
 
         if (AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->get(false)){
             $priceProvider = $request->priceprovider;
         } else {
-            $priceProvider = AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(EvePraisalPriceProvider::class);
+            $priceProvider = AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get();
         }
 
         $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
@@ -102,7 +99,7 @@ class AllianceIndustryController extends Controller
         }
 
         //parse items
-        $parser_result = Parser::parseItems($request->items);
+        $parser_result = Parser::parseItems($request->items, PriceableEveItem::class);
 
         //check item count, don't request prices without any items
         if ($parser_result == null || $parser_result->items->isEmpty()) {
@@ -110,7 +107,7 @@ class AllianceIndustryController extends Controller
             return redirect()->route("allianceindustry.orders");
         }
 
-        $appraised_items = $priceProvider::getPrices($parser_result->items, new AllianceIndustryPriceSettings());
+        PriceProviderSystem::getPrices($priceProvider, $parser_result->items);
 
         $now = now();
         $produce_until = now()->addDays($request->days);
@@ -122,7 +119,7 @@ class AllianceIndustryController extends Controller
             $addToSeatInventory = false;
         }
 
-        foreach ($appraised_items as $item) {
+        foreach ($parser_result->items as $item) {
             if ($item->manualPrice !== null && $item->manualPrice < $item->marketPrice && $prohibitManualPricesBelowValue) {
                 $item->price = $item->marketPrice;
             }
@@ -135,7 +132,7 @@ class AllianceIndustryController extends Controller
         if($request->splitOrders===null) {
             //group mode
             $price = 0;
-            foreach ($appraised_items as $item){
+            foreach ($parser_result->items as $item){
                 $price += $item->amount*$item->price;
             }
 
@@ -162,7 +159,7 @@ class AllianceIndustryController extends Controller
 
             $order->save();
 
-            foreach ($appraised_items as $item) {
+            foreach ($parser_result->items as $item) {
                 $model = new OrderItem();
                 $model->order_id = $order->id;
                 $model->type_id = $item->typeModel->typeID;
@@ -171,7 +168,7 @@ class AllianceIndustryController extends Controller
             }
         } else {
             //classical mode
-            foreach ($appraised_items as $item) {
+            foreach ($parser_result->items as $item) {
                 $order = new Order();
                 $order->quantity = $item->amount;
                 $order->user_id = auth()->user()->id;
@@ -413,44 +410,31 @@ class AllianceIndustryController extends Controller
         $structures = UniverseStructure::all();
 
         $defaultOrderLocation = AllianceIndustrySettings::$DEFAULT_ORDER_LOCATION->get(60003760);
-        $marketHub = AllianceIndustrySettings::$MARKET_HUB->get("jita");
         $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
-        $priceType = AllianceIndustrySettings::$PRICE_TYPE->get("buy");
         $orderCreationPingRoles = implode(" ", AllianceIndustrySettings::$ORDER_CREATION_PING_ROLES->get([]));
         $allowPriceBelowAutomatic = AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->get(false);
         $allowPriceProviderSelection = AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->get(false);
 
-        $industryTimeCostManufacturingModifier = floatval(AllianceIndustrySettings::$MANUFACTURING_TIME_COST_MULTIPLIERS->get(0));
-        $industryTimeCostReactionsModifier = floatval(AllianceIndustrySettings::$REACTION_TIME_COST_MULTIPLIERS->get(0));
 
-        $price_providers = config('treelib.priceproviders');
-        $default_price_provider = $price_providers[AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(EvePraisalPriceProvider::class)] ?? $price_providers[EvePraisalPriceProvider::class];
+        $default_price_provider = AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get();
+        //dd($default_price_provider);
 
         $removeExpiredDeliveries = AllianceIndustrySettings::$REMOVE_EXPIRED_DELIVERIES->get(false);
 
-        return view("allianceindustry::settings", compact("industryTimeCostManufacturingModifier","removeExpiredDeliveries","industryTimeCostReactionsModifier","allowPriceProviderSelection","default_price_provider","marketHub", "mpp", "priceType", "orderCreationPingRoles", "allowPriceBelowAutomatic", "stations", "structures", "defaultOrderLocation"));
+        return view("allianceindustry::settings", compact("removeExpiredDeliveries","allowPriceProviderSelection","default_price_provider", "mpp", "orderCreationPingRoles", "allowPriceBelowAutomatic", "stations", "structures", "defaultOrderLocation"));
     }
 
     public function saveSettings(Request $request)
     {
         $request->validate([
-            "market" => "required|in:jita,perimeter,universe,amarr,dodixie,hek,rens",
-            "pricetype" => "required|in:sell,buy",
             "minimumprofitpercentage" => "required|numeric|min:0",
             "pingRolesOrderCreation" => "string|nullable",
             "allowPriceBelowAutomatic" => "nullable|in:on",
             "defaultLocation" => "required|integer",
-            "defaultPriceProvider" => "required|string",
+            "defaultPriceProvider" => "required|integer",
             "allowPriceProviderSelection"=>"nullable|in:on",
             "removeExpiredDeliveries"=>"nullable|in:on",
-            "industryTimeCostManufacturingModifier"=>"required|integer|min:0",
-            "industryTimeCostReactionsModifier"=>"required|integer|min:0",
         ]);
-
-        if(!class_exists($request->defaultPriceProvider) || !is_subclass_of($request->defaultPriceProvider,AbstractPriceProvider::class)){
-            $request->session()->flash("error","Invalid price provider");
-            return redirect()->back();
-        }
 
         $roles = [];
         if ($request->pingRolesOrderCreation) {
@@ -461,16 +445,13 @@ class AllianceIndustryController extends Controller
             $roles = $matches[0];
         }
 
-        AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->set($request->defaultPriceProvider);
-        AllianceIndustrySettings::$MARKET_HUB->set($request->market);
+        AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->set((int)$request->defaultPriceProvider);
+
         AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->set(floatval($request->minimumprofitpercentage));
-        AllianceIndustrySettings::$PRICE_TYPE->set($request->pricetype);
         AllianceIndustrySettings::$ORDER_CREATION_PING_ROLES->set($roles);
         AllianceIndustrySettings::$ALLOW_PRICES_BELOW_AUTOMATIC->set(boolval($request->allowPriceBelowAutomatic));
         AllianceIndustrySettings::$DEFAULT_ORDER_LOCATION->set($request->defaultLocation);
         AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->set(boolval($request->allowPriceProviderSelection));
-        AllianceIndustrySettings::$MANUFACTURING_TIME_COST_MULTIPLIERS->set($request->industryTimeCostManufacturingModifier);
-        AllianceIndustrySettings::$REACTION_TIME_COST_MULTIPLIERS->set($request->industryTimeCostReactionsModifier);
         AllianceIndustrySettings::$REMOVE_EXPIRED_DELIVERIES->set(boolval($request->removeExpiredDeliveries));
 
         $request->session()->flash("success", "Successfully saved settings");

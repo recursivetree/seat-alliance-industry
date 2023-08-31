@@ -20,6 +20,8 @@ use Seat\Web\Models\User;
 class AllianceIndustryServiceProvider extends AbstractSeatPlugin
 {
     public function boot(){
+        AllianceIndustrySettings::init();
+
         if (!$this->app->routesAreCached()) {
             include __DIR__ . '/Http/routes.php';
         }
@@ -54,7 +56,6 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
         );
 
         $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.sde.tables.php','seat.sde.tables');
-        $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.priceproviders.php','treelib.priceproviders');
 
         Artisan::command('allianceindustry:orders:repeating {--sync}', function () {
             if($this->option("sync")){
@@ -74,8 +75,6 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
     }
 
     public function register(){
-        AllianceIndustrySettings::init();
-
         $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.sidebar.php','package.sidebar');
         $this->registerPermissions(__DIR__ . '/Config/allianceindustry.permissions.php', 'allianceindustry');
     }

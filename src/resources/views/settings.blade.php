@@ -17,9 +17,7 @@
 
                     <div class="form-group">
                         <label for="priceprovider">Default Price Provider</label>
-                        <select id="priceprovider" class="form-control" name="defaultPriceProvider">
-                            <option value="{{ $default_price_provider['class'] }}" selected>{{$default_price_provider['name']}}</option>
-                        </select>
+                        @include("pricescore::utils.instance_selector",["id"=>"priceprovider","name"=>"defaultPriceProvider","instance_id"=>$default_price_provider])
                         <small class="text-muted">The default price provider for orders.</small>
                     </div>
 
@@ -76,51 +74,6 @@
                         <small class="text-muted">Please copy&paste the discord role ids separated by a space. If you enable developer mode in your settings, you can get the IDs by clicking the role.</small>
                     </div>
 
-                    <h5>Price Provider Settings</h5>
-
-                    <p>Not all settings apply to all price providers.</p>
-
-                    <div class="form-group">
-                        <label for="market">Market Hub</label>
-                        <select name="market" id="market" class="form-control">
-                            <option value="jita" @selected($marketHub==="jita")>Jita</option>
-                            <option value="perimeter" @selected($marketHub==="perimeter")>Perimeter</option>
-                            <option value="universe" @selected($marketHub==="universe")>Universe</option>
-                            <option value="amarr" @selected($marketHub==="amarr")>Amarr</option>
-                            <option value="dodixie" @selected($marketHub==="dodixie")>Dodixie</option>
-                            <option value="hek" @selected($marketHub==="hek")>Hek</option>
-                            <option value="rens" @selected($marketHub==="rens")>Rens</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Price Type</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="pricetype" id="markettypesell" value="sell" @checked($priceType==="sell")>
-                            <label class="form-check-label" for="markettypesell">
-                                Sell Prices
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="pricetype" id="markettypebuy" value="buy" @checked($priceType==="buy")>
-                            <label class="form-check-label" for="markettypebuy">
-                                Buy Prices
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="industryTimeCost1">Manufacturing ISK time modifier</label>
-                        <input type="number" id="industryTimeCost1" name="industryTimeCostManufacturingModifier" class="form-control" value="{{ $industryTimeCostManufacturingModifier }}" min="0">
-                        <small class="text-muted">Manufacturing ISK modifier for the <i>Item Build Time</i> price provider in ISK/s.</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="industryTimeCost2">Reaction ISK time modifier</label>
-                        <input type="number" id="industryTimeCost2" name="industryTimeCostReactionsModifier" class="form-control" value="{{ $industryTimeCostReactionsModifier }}" min="0">
-                        <small class="text-muted">Reaction ISK modifier for the <i>Item Build Time</i> price provider in ISK/s.</small>
-                    </div>
-
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary">Update Settings</button>
                     </div>
@@ -135,12 +88,6 @@
             $("#defaultLocation").select2()
             $('[data-toggle="tooltip"]').tooltip()
             $('.data-table').DataTable();
-            $("#priceprovider").select2({
-                ajax:{
-                    url: "{{ route("treelib.priceProviderLookup") }}",
-                    dataType: "json"
-                }
-            })
         });
     </script>
 @endpush

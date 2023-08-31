@@ -34,10 +34,7 @@
                 @if($allowPriceProviderSelection)
                     <div class="form-group">
                         <label for="priceprovider">Price Provider</label>
-                        <select id="priceprovider" class="form-control" name="priceprovider">
-                            <option value="{{ $default_price_provider['class'] }}"
-                                    selected>{{$default_price_provider['name']}}</option>
-                        </select>
+                        @include("pricescore::utils.instance_selector",["id"=>"priceprovider","name"=>"priceprovider","instance_id"=>$default_price_provider])
                         <small class="text-muted">The source of the prices used to calculate the order price.</small>
                     </div>
                 @endif
@@ -128,12 +125,6 @@
         $(document).ready(function () {
             $("#location").select2()
             $('[data-toggle="tooltip"]').tooltip()
-            $("#priceprovider").select2({
-                ajax: {
-                    url: "{{ route("treelib.priceProviderLookup") }}",
-                    dataType: "json"
-                }
-            })
             $('.data-table').DataTable();
         });
     </script>
