@@ -3,7 +3,6 @@
 namespace RecursiveTree\Seat\AllianceIndustry\Api;
 
 use RecursiveTree\Seat\AllianceIndustry\AllianceIndustrySettings;
-use RecursiveTree\Seat\TreeLib\Prices\EvePraisalPriceProvider;
 use Seat\Eveapi\Models\Universe\UniverseStation;
 use Seat\Eveapi\Models\Universe\UniverseStructure;
 
@@ -18,7 +17,7 @@ class AllianceIndustryApi
         $structures = UniverseStructure::all();
         $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
 
-        $default_price_provider = AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(EvePraisalPriceProvider::class);
+        $default_price_provider = AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get();
 
         $allowPriceProviderSelection = AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->get(false);
 

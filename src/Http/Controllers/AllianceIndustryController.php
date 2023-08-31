@@ -248,10 +248,14 @@ class AllianceIndustryController extends Controller
         $item_list = $order->items->map(function ($item){return $item->toEveItem();});
 
         //null is only after update, so don't use the setting
-        $priceProvider = $order->priceProvider ?? EvePraisalPriceProvider::class;
-        $appraised_items = $priceProvider::getPrices($item_list, new AllianceIndustryPriceSettings());
+        $priceProvider = $order->priceProvider;
+        if($priceProvider === null) {
+            return redirect()->back()->with('error','Can\'t update pre-seat-5 orders due to breaking internal changes.');
+        }
+
+        PriceProviderSystem::getPrices($priceProvider, $item_list);
         $price = 0;
-        foreach ($appraised_items as $item){
+        foreach ($item_list as $item){
             $price += $item->amount * $item->price;
         }
         $price *= $profit_multiplier;

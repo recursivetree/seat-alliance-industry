@@ -3,15 +3,13 @@
 namespace RecursiveTree\Seat\AllianceIndustry\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use RecursiveTree\Seat\AllianceIndustry\Item\PriceableEveItem;
+use RecursiveTree\Seat\PricesCore\Contracts\HasTypeID;
 use RecursiveTree\Seat\TreeLib\Items\EveItem;
 use RecursiveTree\Seat\TreeLib\Items\ToEveItem;
 use Seat\Eveapi\Models\Sde\InvType;
-use Seat\Eveapi\Models\Universe\UniverseStation;
-use Seat\Eveapi\Models\Universe\UniverseStructure;
-use Seat\Web\Models\User;
 
-
-class OrderItem extends Model implements ToEveItem
+class OrderItem extends Model implements ToEveItem, HasTypeID
 {
     public $timestamps = false;
 
@@ -25,9 +23,9 @@ class OrderItem extends Model implements ToEveItem
         return $this->hasOne(Order::class, 'id', 'order_id');
     }
 
-    public function toEveItem(): EveItem
+    public function toEveItem(): PriceableEveItem
     {
-        $item = new EveItem($this->type);
+        $item = new PriceableEveItem($this->type);
         $item->amount = $this->quantity;
         return $item;
     }
@@ -54,5 +52,13 @@ class OrderItem extends Model implements ToEveItem
         } else {
             return "invalid order";
         }
+    }
+
+    /**
+     * @return int The eve type id of this object
+     */
+    public function getTypeID(): int
+    {
+        return $this->type_id;
     }
 }
