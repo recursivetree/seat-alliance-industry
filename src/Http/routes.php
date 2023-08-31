@@ -94,4 +94,14 @@ Route::group([
         'uses' => 'AllianceIndustryController@deleteCompletedOrders',
         'middleware' => 'can:allianceindustry.create_orders'
     ]);
+
+    Route::get('/priceprovider/buildtime')
+        ->name('allianceindustry.priceprovider.buildtime.configuration')
+        ->uses('AllianceIndustryController@buildTimePriceProviderConfiguration')
+        ->middleware('can:pricescore.settings');
+
+    Route::post('/priceprovider/buildtime')
+        ->name('allianceindustry.priceprovider.buildtime.configuration.post')
+        ->uses('AllianceIndustryController@buildTimePriceProviderConfigurationPost')
+        ->middleware('can:pricescore.settings');
 });

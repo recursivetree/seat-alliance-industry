@@ -54,6 +54,7 @@ class AllianceIndustryServiceProvider extends AbstractSeatPlugin
         $this->mergeConfigFrom(
             __DIR__ . '/Config/inventory.sources.php', 'inventory.sources'
         );
+        $this->mergeConfigFrom(__DIR__ . '/Config/priceproviders.backends.php','priceproviders.backends');
 
         $this->mergeConfigFrom(__DIR__ . '/Config/allianceindustry.sde.tables.php','seat.sde.tables');
 
