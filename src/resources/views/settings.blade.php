@@ -18,7 +18,7 @@
                     <div class="form-group">
                         <label for="priceprovider">Default Price Provider</label>
                         @include("pricescore::utils.instance_selector",["id"=>"priceprovider","name"=>"defaultPriceProvider","instance_id"=>$default_price_provider])
-                        <small class="text-muted">The default price provider for orders.</small>
+                        <small class="text-muted">The default price provider for orders. Manage price providers in the <a href="{{route('pricescore::settings')}}">price provider settings</a>.</small>
                     </div>
 
                     <div class="form-group">
