@@ -9,6 +9,7 @@ use RecursiveTree\Seat\AllianceIndustry\Jobs\UpdateRepeatingOrders;
 use RecursiveTree\Seat\AllianceIndustry\Models\Order;
 use RecursiveTree\Seat\AllianceIndustry\Models\Delivery;
 use RecursiveTree\Seat\AllianceIndustry\Models\OrderItem;
+use RecursiveTree\Seat\PricesCore\Exceptions\PriceProviderException;
 use RecursiveTree\Seat\PricesCore\Facades\PriceProviderSystem;
 use RecursiveTree\Seat\PricesCore\Models\PriceProviderInstance;
 use RecursiveTree\Seat\TreeLib\Helpers\SeatInventoryPluginHelper;
@@ -101,7 +102,11 @@ class AllianceIndustryController extends Controller
             return redirect()->route("allianceindustry.orders");
         }
 
-        PriceProviderSystem::getPrices($priceProvider, $parser_result->items);
+        try {
+            PriceProviderSystem::getPrices($priceProvider, $parser_result->items);
+        } catch (PriceProviderException $e){
+            return redirect()->back()->with('error',$e->getMessage());
+        }
 
         $now = now();
         $produce_until = now()->addDays($request->days);
