@@ -4,10 +4,9 @@ namespace RecursiveTree\Seat\AllianceIndustry\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use RecursiveTree\Seat\AllianceIndustry\Item\PriceableEveItem;
-use RecursiveTree\Seat\PricesCore\Contracts\HasTypeID;
-use RecursiveTree\Seat\TreeLib\Items\EveItem;
 use RecursiveTree\Seat\TreeLib\Items\ToEveItem;
 use Seat\Eveapi\Models\Sde\InvType;
+use Seat\Services\Contracts\HasTypeID;
 
 class OrderItem extends Model implements ToEveItem, HasTypeID
 {

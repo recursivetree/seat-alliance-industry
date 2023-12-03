@@ -2,8 +2,8 @@
 
 namespace RecursiveTree\Seat\AllianceIndustry\Item;
 
-use RecursiveTree\Seat\PricesCore\Contracts\IPriceable;
 use RecursiveTree\Seat\TreeLib\Items\EveItem;
+use Seat\Services\Contracts\IPriceable;
 
 class PriceableEveItem extends EveItem implements IPriceable
 {

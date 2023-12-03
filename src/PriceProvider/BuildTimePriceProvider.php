@@ -4,10 +4,9 @@ namespace RecursiveTree\Seat\AllianceIndustry\PriceProvider;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Ramsey\Collection\Exception\OutOfBoundsException;
-use RecursiveTree\Seat\PricesCore\Contracts\IPriceable;
 use RecursiveTree\Seat\PricesCore\Contracts\IPriceProviderBackend;
 use RecursiveTree\Seat\PricesCore\Exceptions\PriceProviderException;
+use Seat\Services\Contracts\IPriceable;
 
 class BuildTimePriceProvider implements IPriceProviderBackend
 {
