@@ -79,7 +79,11 @@ class AllianceIndustryController extends Controller
         if (AllianceIndustrySettings::$ALLOW_PRICE_PROVIDER_SELECTION->get(false)){
             $priceProvider = $request->priceprovider;
         } else {
-            $priceProvider = AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get();
+            $priceProvider = AllianceIndustrySettings::$DEFAULT_PRICE_PROVIDER->get(null);
+        }
+
+        if($priceProvider == null) {
+            return redirect()->back()->with('error','No price provider configured or selected!');
         }
 
         $mpp = AllianceIndustrySettings::$MINIMUM_PROFIT_PERCENTAGE->get(2.5);
@@ -252,7 +256,12 @@ class AllianceIndustryController extends Controller
             return redirect()->back()->with('error','Can\'t update pre-seat-5 orders due to breaking internal changes.');
         }
 
-        PriceProviderSystem::getPrices($priceProvider, $item_list);
+        try {
+            PriceProviderSystem::getPrices($priceProvider, $item_list);
+        } catch (PriceProviderException $e){
+            return redirect()->back()->with('error',sprintf('The price provider failed to fetch prices: %s',$e->getMessage()));
+        }
+
         $price = 0;
         foreach ($item_list as $item){
             $price += $item->amount * $item->price;
