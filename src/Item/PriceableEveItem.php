@@ -20,5 +20,6 @@ class PriceableEveItem extends EveItem implements IPriceable
     public function setPrice(float $price): void
     {
         $this->price = $price;
+        $this->marketPrice = $price;
     }
 }

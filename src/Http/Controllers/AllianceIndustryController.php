@@ -123,6 +123,10 @@ class AllianceIndustryController extends Controller
         }
 
         foreach ($parser_result->items as $item) {
+            if($item->manualPrice) {
+                $item->price = $item->manualPrice;
+            }
+
             if ($item->manualPrice !== null && $item->manualPrice < $item->marketPrice && $prohibitManualPricesBelowValue) {
                 $item->price = $item->marketPrice;
             }
@@ -136,7 +140,7 @@ class AllianceIndustryController extends Controller
             //group mode
             $price = 0;
             foreach ($parser_result->items as $item){
-                $price += $item->amount*$item->price;
+                $price += $item->price; // amount is multiplied in price providers
             }
 
             $order = new Order();
@@ -175,7 +179,7 @@ class AllianceIndustryController extends Controller
                 $order = new Order();
                 $order->quantity = $item->amount;
                 $order->user_id = auth()->user()->id;
-                $order->price = $item->price * 1; // * 1 stands for the multiplication with the quantity used in the update prices section
+                $order->price = $item->price; // if multiple items, this is already multiplied in the price provider
                 $order->location_id = $request->location;
                 $order->created_at = $now;
                 $order->produce_until = $produce_until;
