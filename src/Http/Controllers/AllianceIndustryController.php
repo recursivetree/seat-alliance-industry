@@ -124,7 +124,7 @@ class AllianceIndustryController extends Controller
 
         foreach ($parser_result->items as $item) {
             if($item->manualPrice) {
-                $item->price = $item->manualPrice;
+                $item->price = $item->manualPrice * $item->amount;
             }
 
             if ($item->manualPrice !== null && $item->manualPrice < $item->marketPrice && $prohibitManualPricesBelowValue) {
