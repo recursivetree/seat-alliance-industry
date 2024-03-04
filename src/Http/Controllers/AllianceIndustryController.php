@@ -179,7 +179,7 @@ class AllianceIndustryController extends Controller
                 $order = new Order();
                 $order->quantity = $item->amount;
                 $order->user_id = auth()->user()->id;
-                $order->price = $item->price; // if multiple items, this is already multiplied in the price provider
+                $order->price = $item->price / $item->amount; // the plugin expects the price for one item, although the price provider returns prices for the whole stack
                 $order->location_id = $request->location;
                 $order->created_at = $now;
                 $order->produce_until = $produce_until;
